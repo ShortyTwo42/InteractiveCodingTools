@@ -1,0 +1,259 @@
+html, body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    min-height: 30rem;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+html *, body * {
+    font-family: inherit;
+}
+
+.ict-range {
+    background: #454545;
+    color: #ffffff;
+    border-radius: 0.5rem;
+    height: 100%;
+    display: flex;
+    flex-flow: column;
+}
+
+.ict-header {
+    flex: 0 0 auto;
+}
+
+.ict-header h1 {
+    text-align: center;
+    margin: 0.3rem;
+}
+
+.ict-subHeader {
+    padding: 0.3rem 1rem 0.3rem 1rem;
+    border-style: solid;
+    border-width: 0.1rem 0rem 0rem 0rem;
+    display: flex;
+    flex-direction: row;
+}
+
+.ict-subHeaderItem {
+    flex: 45%;
+    font-size: 1.2rem;
+}
+
+.ict-subHeaderItem input {
+    border-style: none;
+    border-color: #232323;
+    background: transparent;
+    color: #ffffff;
+    border-bottom-style: solid;
+    font-size: inherit;
+}
+
+.ict-menu {
+    padding: 0.3rem 1rem 0.3rem 1rem;
+    border-style: solid;
+    border-width: 0.1rem 0rem 0.1rem 0rem;
+}
+
+button {
+    padding: 0.5rem 1rem 0.5rem 0rem;
+    cursor: pointer;
+    color: #ffffff;
+    background-color: transparent;
+    border: none;
+}
+
+.ict-content {
+    display: flex;
+    flex: 1 1 auto;
+    overflow: hidden;
+}
+
+.ict-codingSpace {
+    flex-basis: auto;
+    width: 50%;
+    overflow: hidden;
+    padding: 0.5rem;
+    position: relative;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.ict-wrapper {
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.ict-editor {
+    width: 100%;
+    height: 99%;
+    display: inline-flex;
+    font-family: monospace;
+    line-height: 1.3rem;
+    background: #232323;
+}
+
+.background-codeSpace {
+    background: #232323;
+}
+
+.background-previewSpace {
+    background: #ffffff;
+}
+
+.ict-lineNumbers {
+    min-width: 1.5rem;
+    text-align: right;
+    position: sticky;
+    left: 0;
+    padding-right: 1rem;
+    background: #232323;
+}
+
+.ict-lineNumbers span {
+    counter-increment: linenumber;
+}
+
+.ict-lineNumbers span:before {
+    content: counter(linenumber);
+    display: block;
+    color: #dddddd;
+}
+
+.ict-code {
+    width: 100%;
+    line-height: 1.3rem;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    white-space: nowrap;
+    padding: 0;
+    border: 0;
+    background: #232323;
+    color: #ffffff;
+    outline: none;
+    resize: none
+}
+
+.ict-previewSpace {
+    flex-basis: auto;
+    width: 50%;
+    overflow: hidden;
+    padding: 0.5rem;
+    position: relative;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.ict-display {
+    width: 100%;
+    height: 100%;
+}
+
+.ict-display svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Custom Scrollbar */
+.ict-previewSpace::-webkit-scrollbar,
+.ict-code::-webkit-scrollbar,
+.ict-wrapper::-webkit-scrollbar {
+    width: 0.5rem;
+    height: 0.5rem;
+}
+
+.ict-previewSpace::-webkit-scrollbar-track,
+.ict-code::-webkit-scrollbar-track,
+.ict-wrapper::-webkit-scrollbar-track {
+    background: transparent; 
+}
+ 
+.ict-previewSpace::-webkit-scrollbar-thumb,
+.ict-code::-webkit-scrollbar-thumb,
+.ict-wrapper::-webkit-scrollbar-thumb {
+    background: #888888; 
+    border-radius: 1rem;
+}
+  
+.ict-previewSpace::-webkit-scrollbar-thumb:hover,
+.ict-code::-webkit-scrollbar-thumb:hover,
+.ict-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #555555;
+}
+
+.file_uploader {
+    display: none;
+}
+
+.file_upload_label {
+    cursor: pointer;
+}
+
+.float-right {
+    float: right;
+}
+
+.ict-switch {
+    position: relative;
+    display: inline-block;
+    width: 3rem;
+    height: 1.8rem;
+    margin-right: 0.5rem;
+  }
+  
+.ict-switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+  
+.ict-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cccccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 1.8rem;
+}
+  
+.ict-slider:before {
+    position: absolute;
+    content: "";
+    height: 1.5rem;
+    width: 1.5rem;
+    left: 0.2rem;
+    bottom: 0.16rem;
+    background-color: #ffffff;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 50%;
+}
+  
+input:checked + .ict-slider {
+    background-color: #232323;
+}
+
+input:checked + .ict-slider:before {
+    -webkit-transform: translateX(1rem);
+    -ms-transform: translateX(1rem);
+    transform: translateX(1rem);
+}
+  
+@media (max-width: 800px) {
+    .ict-subHeader {
+        flex-direction: column;
+    }
+    .ict-subHeaderItem {
+        flex: 100%;
+        font-size: 1rem;
+    }
+}

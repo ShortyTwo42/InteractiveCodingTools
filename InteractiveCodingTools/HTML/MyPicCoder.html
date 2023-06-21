@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="../CSS/fontawesome/css/all.min.css">               <!-- keep this for fontawesome icons (save, load, ...) -->
+        <link rel="stylesheet" href="../CSS/InteractiveCodingTemplate.css">             <!-- keep this for the representation of the tool -->
+        <script src="../JavaScript/InteractiveCodingTemplate.js"></script>              <!-- keep this for the basic javascript functionalities -->
+        <script src="../JavaScript/MyPicCoder.js"></script>
+    </head>
+    <body>   
+        <div class="ict-range">
+            <div class="ict-header">
+                <h1>
+                    MyPicCoder
+                </h1>
+                <div class="ict-subHeader">
+                    <div class="ict-subHeaderItem">
+                        <label for="ict-fileName">
+                            Dateiname
+                        </label>
+                        <input id="ict-fileName" value="Bild"></input>
+                    </div>
+                </div>
+                <div class="ict-menu">
+                    <button onclick="tryFileDownload()">
+                        <i class="fa-solid fa-floppy-disk fa-2xl"></i>
+                    </button>
+                    <button>
+                        <label for="file-upload" class="file_upload_label">
+                            <i class="fa-solid fa-folder-open fa-2xl"></i>
+                        </label>
+                        <input type="file" id="file-upload" class="file_uploader" onchange="tryFileUpload()"/>  
+                    </button>
+                    <button onclick="toggleView('100%', '0%')" title="Code maximieren">
+                        <i class="fa-solid fa-arrow-right fa-2xl"></i>
+                    </button>
+                    <button onclick="toggleView('50%', '50%')" title="Split Screen">
+                        <i class="fa-solid fa-arrows-left-right fa-2xl"></i>
+                    </button>
+                    <button onclick="toggleView('0%', '100%')" title="Preview maximieren">
+                        <i class="fa-solid fa-arrow-left fa-2xl"></i>
+                    </button>
+                    <button onclick="display()" title="Lade Preview" class="float-right">
+                        <i class="fa-solid fa-code fa-2xl"></i>
+                    </button>
+                    <label class="ict-switch float-right" title="Live Preview">
+                        <input type="checkbox" onchange="toggleAutoRefresh(this)" checked>
+                        <span class="ict-slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="ict-content">
+                <div class="ict-codingSpace">
+                    <div class="ict-wrapper background-codeSpace">
+                        <div class="ict-editor">
+                            <div class="ict-lineNumbers">
+                                <span></span>
+                            </div>
+                            <textarea class="ict-code" oninput="display()"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="ict-previewSpace">
+                    <div class="ict-display background-previewSpace">
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

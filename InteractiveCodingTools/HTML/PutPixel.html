@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="../CSS/fontawesome/css/all.min.css">               <!-- keep this for fontawesome icons (save, load, ...) -->
+        <link rel="stylesheet" href="../CSS/InteractiveCodingTemplate.css">             <!-- keep this for the representation of the tool -->
+        <script src="../JavaScript/InteractiveCodingTemplate.js"></script>              <!-- keep this for the basic javascript functionalities -->
+        <script src="../JavaScript/PutPixel.js"></script>
+    </head>
+    <body>   
+        <div class="ict-range">
+            <div class="ict-header">
+                <h1>
+                    PutPixel
+                </h1>
+                <div class="ict-subHeader">
+                    <div class="ict-subHeaderItem">
+                        <label for="ict-fileWidth">
+                            Breite
+                        </label>
+                        <input type="number" id="ict-fileWidth" onchange="updateOutput()"></input>
+                    </div>
+                    <div class="ict-subHeaderItem">
+                        <label for="ict-fileHeight">
+                            Höhe
+                        </label>
+                        <input type="number" id="ict-fileHeight" onchange="updateOutput()"></input>
+                    </div>
+                </div>
+                <div class="ict-menu">
+                    <button onclick="resetToDefault()" title="Zurücksetzen auf Beginn">
+                        <i class="fa-solid fa-rotate-right fa-2xl"></i>
+                    </button>
+                    <button onclick="toggleView('100%', '0%')" title="Code maximieren">
+                        <i class="fa-solid fa-arrow-right fa-2xl"></i>
+                    </button>
+                    <button onclick="toggleView('50%', '50%')" title="Split Screen">
+                        <i class="fa-solid fa-arrows-left-right fa-2xl"></i>
+                    </button>
+                    <button onclick="toggleView('0%', '100%')" title="Preview maximieren">
+                        <i class="fa-solid fa-arrow-left fa-2xl"></i>
+                    </button>
+                    <button onclick="tryExecuteCode()" title="Programm ausführen" class="float-right">
+                        <i class="fa-solid fa-code fa-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="ict-content">
+                <div class="ict-codingSpace">
+                    <div class="ict-wrapper background-codeSpace">
+                        <div class="ict-editor">
+                            <div class="ict-lineNumbers">
+                                <span></span>
+                            </div>
+                            <textarea class="ict-code"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="ict-previewSpace">
+                    <div class="ict-display">
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

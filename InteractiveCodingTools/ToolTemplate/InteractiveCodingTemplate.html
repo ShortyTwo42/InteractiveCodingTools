@@ -1,0 +1,65 @@
+<!-- 
+    This is an html template to create a new interactive coding Tool (ict).
+    Feel free to use it and to create new tools
+    author: Leon Endris
+-->
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="../CSS/fontawesome/css/all.min.css">               <!-- keep this for fontawesome icons (save, load, ...) -->
+        <link rel="stylesheet" href="../CSS/InteractiveCodingTemplate.css">             <!-- keep this for the representation of the tool -->
+        <script src="../JavaScript/InteractiveCodingTemplate.js"></script>              <!-- keep this for the basic javascript functionalities -->
+    </head>
+    <body>   
+        <div class="ict-range">
+            <div class="ict-header">
+                <h1>
+                    InteractiveCodingTool
+                </h1>
+                <div class="ict-menu">
+                    <button onclick="tryFileDownload()">
+                        <i class="fa-solid fa-floppy-disk fa-2xl"></i>
+                    </button>
+                    <button>
+                        <label for="file-upload" class="file_upload_label">
+                            <i class="fa-solid fa-folder-open fa-2xl"></i>
+                        </label>
+                        <input type="file" id="file-upload" class="file_uploader" onchange="tryFileUpload()"/>  
+                    </button>
+                    <button onclick="toggleView('100%', '0%')" title="Code maximieren">
+                        <i class="fa-solid fa-arrow-right fa-2xl"></i>
+                    </button>
+                    <button onclick="toggleView('50%', '50%')" title="Split Screen">
+                        <i class="fa-solid fa-arrows-left-right fa-2xl"></i>
+                    </button>
+                    <button onclick="toggleView('0%', '100%')" title="Preview maximieren">
+                        <i class="fa-solid fa-arrow-left fa-2xl"></i>
+                    </button>
+                    <button onclick="display()" title="Code visualisieren">
+                        <i class="fa-solid fa-code fa-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="ict-content">
+                <div class="ict-codingSpace">
+                    <div class="ict-wrapper background-codeSpace">
+                        <div class="ict-editor">
+                            <div class="ict-lineNumbers">
+                                <span></span>
+                            </div>
+                            <textarea class="ict-code"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="ict-previewSpace">
+                    <div class="ict-wrapper">
+                        <div class="ict-display">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
