@@ -86,7 +86,7 @@ function transformToSvg(rawFile, type = 'image/svg+xml') {
     switch (type) {
         case 'image/x-portable-bitmap':
             var cleanFile = preprocessFile(rawFile);
-            console.log(cleanFile);
+            // console.log(cleanFile);
 
             var lines = cleanFile.split('\n');              // split lines into array
             lines.shift();                                  // remove header (P1)
@@ -97,7 +97,7 @@ function transformToSvg(rawFile, type = 'image/svg+xml') {
             svg += '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n';
             svg += '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + width + ' ' + height + '">\n';
 
-            var picInfo = lines.join(' ').split(/\s+/);
+            var picInfo = lines.join(' ').trim().split(/\s+/);
 
             for (var y = 0; y < height; y++) { 
                 for (var x = 0; x < width; x++) {
@@ -122,7 +122,7 @@ function transformToSvg(rawFile, type = 'image/svg+xml') {
             break;
         case 'image/x-portable-graymap':
             var cleanFile = preprocessFile(rawFile);
-            console.log(cleanFile);
+            // console.log(cleanFile);
             
             var lines = cleanFile.split('\n');              // split lines into array
             lines.shift();                                  // remove header (P2)
@@ -134,7 +134,7 @@ function transformToSvg(rawFile, type = 'image/svg+xml') {
             svg += '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n';
             svg += '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + width + ' ' + height + '">\n';
 
-            var picInfo = lines.join(' ').split(/\s+/);
+            var picInfo = lines.join(' ').trim().split(/\s+/);
 
             for (var y = 0; y < height; y++) { 
                 for (var x = 0; x < width; x++) {
@@ -159,7 +159,7 @@ function transformToSvg(rawFile, type = 'image/svg+xml') {
             break;
         case 'image/x-portable-pixmap':
             var cleanFile = preprocessFile(rawFile);
-            console.log(cleanFile);
+            // console.log(cleanFile);
 
             var lines = cleanFile.split('\n');              // split lines into array
             lines.shift();                                  // remove header (P3)
@@ -171,7 +171,7 @@ function transformToSvg(rawFile, type = 'image/svg+xml') {
             svg += '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n';
             svg += '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + width + ' ' + height + '">\n';
 
-            var picInfo = lines.join(' ').split(/\s+/);
+            var picInfo = lines.join(' ').trim().split(/\s+/);
 
             for (var y = 0; y < height; y++) { 
                 for (var x = 0; x < width; x++) {

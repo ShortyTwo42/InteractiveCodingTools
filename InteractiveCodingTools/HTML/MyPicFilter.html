@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="../CSS/fontawesome/css/all.min.css">               <!-- keep this for fontawesome icons (save, load, ...) -->
+        <link rel="stylesheet" href="../CSS/InteractiveCodingTemplate.css">             <!-- keep this for the representation of the tool -->
+        <link rel="stylesheet" href="../CSS/MyPicFilter.css">  
+        <script src="../JavaScript/InteractiveCodingTemplate.js"></script>              <!-- keep this for the basic javascript functionalities -->
+        <script src="../JavaScript/MyPicFilter.js"></script>
+    </head>
+    <body>   
+        <div class="ict-range">
+            <div class="ict-header">
+                <h1>
+                    MyPicFilter
+                </h1>
+                <div class="ict-menu">
+                    <button onclick="tryFileDownload()" id="download_button">
+                        <i class="fa-solid fa-floppy-disk fa-2xl"></i>
+                    </button>
+                    <button id="upload_button">
+                        <label for="file-upload" class="file_upload_label">
+                            <i class="fa-solid fa-folder-open fa-2xl"></i>
+                        </label>
+                        <input type="file" id="file-upload" accept="image/x-portable-graymap, image/x-portable-pixmap" class="file_uploader" onchange="tryFileUpload()"/>  
+                    </button>
+                    <button onclick="toggleView('100%', '0%')" title="Original maximieren" id="max_original_button">
+                        <i class="fa-solid fa-arrow-right fa-2xl"></i>
+                    </button>
+                    <button onclick="toggleView('50%', '50%')" title="Split Screen" id="split_screen_button">
+                        <i class="fa-solid fa-arrows-left-right fa-2xl"></i>
+                    </button>
+                    <button onclick="toggleView('0%', '100%')" title="Gefiltertes Bild maximieren" id="max_filtered_button">
+                        <i class="fa-solid fa-arrow-left fa-2xl"></i>
+                    </button>
+                    <button onclick="toggleFilterMenu()" title="Filter bearbeiten" class="float-right">
+                        <i class="fa-solid fa-table-cells fa-2xl"></i>
+                    </button>
+                    <button onclick="applyFilter()" title="Filter anwenden" class="float-right" id="filter_button">
+                        <i class="fa-solid fa-play fa-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="ict-content">
+                <div class="ict-codingSpace">
+                    <div class="ict-wrapper mine_shaft-background">
+                        <canvas id="original_img" class="fill_width">
+                            
+                        </canvas>
+                    </div>
+                </div>
+                <div class="ict-previewSpace">
+                    <div class="ict-wrapper mine_shaft-background">
+                        <canvas id="filtered_img" class="fill_width">
+                            
+                        </canvas>
+                    </div>
+                </div>
+                <div class="filter_menu" style="display: none">
+                    <div class="range_container">
+                        <div class="range">
+                            <div class="range_item">
+                                <label for="filter_type">
+                                    Filter:
+                                </label>
+                                <select id="filter_type" onchange="selectNewFilter(this)">
+                                    <option value="none">
+                                        Kein Filter
+                                    </option>
+                                    <option value="median">
+                                        Median-Filter
+                                    </option>
+                                    <option value="mean">
+                                        Mittelwert-Filter
+                                    </option>
+                                    <option value="gaussian">
+                                        Gauß-Filter
+                                    </option>
+                                </select> 
+                            </div>
+
+                            <div class="range_item">
+                                <label for="border_treatment">
+                                    Randbehandlung:
+                                </label>
+                                <select id="border_treatment">
+                                    <option value="none">
+                                        Keine Randbehandlung
+                                    </option>
+                                    <option value="repeat">
+                                        Äußeres Pixel wiederholen
+                                    </option>
+                                    <option value="mirror">
+                                        Pixel spiegeln
+                                    </option>
+                                </select> 
+                            </div>
+                        </div>
+                        <div id="none_tab" class="range tab">
+                            <div class="ict-wrapper no-xScroll">
+                                <div class="ict-box">
+                                    <h2>Filter-Info</h2>
+                                    Momentan ist kein Filter ausgewählt. Das Eingabebild wird bei Durchführung der Filterung nur kopiert
+                                </div> 
+                            </div>
+                        </div>
+                        <div id="median_tab" class="range tab" style="display: none">
+                            <div class="ict-wrapper no-xScroll">
+                                <div class="ict-box">
+                                    <h2>Filter-Info</h2>
+                                    Der Median-Filter betrachtet alle Pixel in seinem Einflussbereich, 
+                                    sortiert diese aufsteigend nach ihrem Wert und wählt anschließend das 
+                                    mittlere Element als neuen Wert für das aktuelle Pixel aus.
+                                </div>
+                                <div class="ict-box">
+                                    <h2>Filter-Optionen</h2>
+                                    <label for="median_radius">
+                                        Radius
+                                    </label>
+                                    <div class="ict-number_container">
+                                        <button onclick="decreaseNumber('median_radius')" class="decrease_button">-</button>
+                                        <input type="number" min="1" max="5" class="ict-numbers" id="median_radius" value="1" readonly/>
+                                        <button onclick="increaseNumber('median_radius')" class="increase_button">+</button>
+                                    </div>
+                                    <div class="filterPreview" id="median_filter_preview">
+                                    
+                                    </div>  
+                                </div>
+                            </div>
+                        </div>
+                        <div id="mean_tab" class="range tab" style="display: none">
+                            <div class="ict-wrapper no-xScroll">
+                                <div class="ict-box">
+                                    <h2>Filter-Info</h2>
+                                    Der Mittelwert-Filter summiert alle Werte der Pixel in seinem Einflussbereich auf.
+                                    Anschließend wird der aufsummierte Wert durch die Anzahl an Pixeln im Einflussbereich geteilt.
+                                    Der somit ermittelte Mittelwert wird als neuer Wert für das aktuelle Pixel eingesetzt.
+                                </div>
+                                <div class="ict-box">
+                                    <h2>Filter-Optionen</h2>
+                                    <label for="mean_radius">
+                                        Radius
+                                    </label>
+                                    <div class="ict-number_container">
+                                        <button onclick="decreaseNumber('mean_radius')" class="decrease_button">-</button>
+                                        <input type="number" min="1" max="5" class="ict-numbers" id="mean_radius" value="1" readonly/>
+                                        <button onclick="increaseNumber('mean_radius')" class="increase_button">+</button>
+                                    </div>
+                                    <div class="filterPreview" id="mean_filter_preview">
+                                    
+                                    </div>  
+                                </div>
+                            </div>
+                        </div>
+                        <div id="gaussian_tab" class="range tab" style="display: none">
+                            <div class="ict-wrapper no-xScroll">
+                                <div class="ict-box">
+                                    <h2>Filter-Info</h2>
+                                    Der Gauß-Filter funktioniert ähnlich wie der Mittelwert-Filter. Es wird nur davon ausgegangen, dass
+                                    weiter entfehrnte Pixelwerte weniger einfluss auf unser zentrales Pixel nehmen sollten. Deshalb werden
+                                    die Pixelwerte zusätzlich gewichtet. Desto näher der Pixel zum aktuellen Pixel, desto größer sein Einfluss
+                                    auf den neu berechneten Wert.
+                                </div>
+                                <div class="ict-box">
+                                    <h2>Filter-Optionen</h2>
+                                    <label for="gaussian_radius">Radius</label>
+                                    <div class="ict-number_container">
+                                        <button onclick="decreaseNumber('gaussian_radius')" class="decrease_button">-</button>
+                                        <input type="number" min="1" max="5" class="ict-numbers" id="gaussian_radius" value="1" readonly/>
+                                        <button onclick="increaseNumber('gaussian_radius')" class="increase_button">+</button>
+                                    </div>
+                                    <div class="filterPreview" id="gaussian_filter_preview">
+                                    
+                                    </div>  
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
