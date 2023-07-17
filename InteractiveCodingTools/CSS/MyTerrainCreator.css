@@ -1,0 +1,70 @@
+.canvas_wrapper {
+    height: 100%; 
+    display: flex;  
+}
+
+.sidebar {
+    min-width: 4rem;
+    height: 100%;
+}
+
+.sidebar-nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+.nav-item {
+    width: 100%;
+}
+
+.nav-item>button{
+    display: flex;
+    align-items: center;
+    height: 3rem;
+    padding: 0;
+}
+
+.nav-item>button>i {
+    margin: 0 1.5rem;
+}
+
+.canvas_container {
+    height: 100%;
+    flex-grow: 1;
+    overflow: scroll;
+}
+
+.my_terrain_menu {
+    flex-grow: 1;
+}
+
+.active_elem {
+    color: var(--active_elem);
+}
+
+
+/* Custom Scrollbar */
+.canvas_container::-webkit-scrollbar {
+    width: 0.5rem;
+    height: 0.5rem;
+}
+
+.canvas_container::-webkit-scrollbar-track {
+    background: transparent; 
+}
+ 
+.canvas_container::-webkit-scrollbar-thumb {
+    background: var(--gray); 
+    border-radius: 1rem;
+}
+  
+.ict-previewSpace::-webkit-scrollbar-thumb:hover,
+.ict-code::-webkit-scrollbar-thumb:hover,
+.ict-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--emperor);
+}

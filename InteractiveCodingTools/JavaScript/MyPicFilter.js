@@ -41,7 +41,11 @@ function uploadFile() {
                 ppmToCanvas(canvas, currentPicture);
             }
         }
+
         reader.readAsText(file);
+        // cuts off file extension
+        let fileName = file.name.split('.').slice(0, -1).join('.');
+        document.getElementById('ict-fileName').value = fileName;
     }
 }
 
@@ -75,7 +79,7 @@ function prepareFile(file) {
             var dimensions = lines.shift().split(' ');          // get the dimensions
             fileInfo.width = parseInt(dimensions[0]);           // get width from dimension
             fileInfo.height = parseInt(dimensions[1]);          // get height from dimension
-            var maxValue = parseInt(lines.shift());             // get the brightness maxValue 
+            fileInfo.maxValue   = parseInt(lines.shift());      // get the brightness maxValue 
             var picInfo = lines.join(' ').trim().split(/\s+/);
 
             for (var y = 0; y < fileInfo.height; y++) {
@@ -88,7 +92,7 @@ function prepareFile(file) {
                         var pixelVal = 255;
                     }
                     else {
-                        var pixelVal = Math.round((parseInt(picInfo[currIndex]) / maxValue) * 255);
+                        var pixelVal = Math.round((parseInt(picInfo[currIndex]) / fileInfo.maxValue ) * 255);
                     }
                     newRow.push(pixelVal);
                 }
@@ -103,7 +107,7 @@ function prepareFile(file) {
             var dimensions = lines.shift().split(' ');          // get the dimensions
             fileInfo.width = parseInt(dimensions[0]);           // get width from dimension
             fileInfo.height = parseInt(dimensions[1]);          // get height from dimension
-            var maxValue = parseInt(lines.shift());             // get the brightness maxValue 
+            fileInfo.maxValue = parseInt(lines.shift());        // get the brightness maxValue 
             var picInfo = lines.join(' ').trim().split(/\s+/);
 
             for (var y = 0; y < fileInfo.height; y++) {
@@ -121,9 +125,9 @@ function prepareFile(file) {
                         rgb.push(pixelVal); //b
                     }
                     else {
-                        rgb.push(Math.round((parseInt(picInfo[currIndex]) / maxValue) * 255));      //r
-                        rgb.push(Math.round((parseInt(picInfo[currIndex + 1]) / maxValue) * 255));  //g
-                        rgb.push(Math.round((parseInt(picInfo[currIndex + 2]) / maxValue) * 255));  //b
+                        rgb.push(Math.round((parseInt(picInfo[currIndex]) / fileInfo.maxValue ) * 255));      //r
+                        rgb.push(Math.round((parseInt(picInfo[currIndex + 1]) / fileInfo.maxValue ) * 255));  //g
+                        rgb.push(Math.round((parseInt(picInfo[currIndex + 2]) / fileInfo.maxValue ) * 255));  //b
                     }
                     newRow.push(rgb);
                 }
@@ -138,6 +142,14 @@ function prepareFile(file) {
 }
 
 function pgmToCanvas(canvas, picInfo) {
+    // get rid of download as ppm
+    let save_as = document.getElementById('save_as');
+    let hide_option = save_as.querySelector('option[value=ppm]');
+    let show_option = save_as.querySelector('option[value=pgm]');
+    hide_option.style.display = 'none';
+    show_option.style.display = '';
+    save_as.value = 'pgm';
+    
     canvas.width = picInfo.width;
     canvas.height = picInfo.height;
     let context = canvas.getContext('2d');
@@ -151,6 +163,14 @@ function pgmToCanvas(canvas, picInfo) {
 }
 
 function ppmToCanvas(canvas, picInfo) {
+    // get rid of download as pgm
+    let save_as = document.getElementById('save_as');
+    let hide_option = save_as.querySelector('option[value=pgm]');
+    let show_option = save_as.querySelector('option[value=ppm]');
+    hide_option.style.display = 'none';
+    show_option.style.display = '';
+    save_as.value = 'ppm';
+
     canvas.width = picInfo.width;
     canvas.height = picInfo.height;
     let context = canvas.getContext('2d');
@@ -201,11 +221,12 @@ function applyFilter() {
 }
 
 function applyNone(canvas) {
-    if (currentPicture.type == 'pgm') {
-        pgmToCanvas(canvas, currentPicture);
+    filteredPicture = structuredClone(currentPicture);
+    if (filteredPicture.type == 'pgm') {
+        pgmToCanvas(canvas, filteredPicture);
     }
-    else if (currentPicture.type == 'ppm') {
-        ppmToCanvas(canvas, currentPicture);
+    else if (filteredPicture.type == 'ppm') {
+        ppmToCanvas(canvas, filteredPicture);
     }
 }
 
@@ -629,12 +650,12 @@ function setFilterPreview(filter_type) {
     for (let y = 0; y < max_filter_size; y++) { 
         for (let x = 0; x < max_filter_size; x++) {
             
-            let pixelVal = 'white';
+            let pixelVal = '#ffffff';
             if(x == middle_pixel && y == middle_pixel) {
-                pixelVal = 'red';
+                pixelVal = '#ff0000';
             }
             else if (lower_limit <= x && x <= upper_limit && lower_limit <= y && y <= upper_limit ) {
-                pixelVal = 'black';
+                pixelVal = '#000000';
             }
 
             let newRect = '<rect x="' + x +'" y="' + y + '" width="1" height="1" fill="'+ pixelVal +'" style="stroke-width: 0.05; stroke: var(--emperor)"/>\n'
@@ -674,3 +695,203 @@ function quicksort(array) {
     
     return quicksort(left).concat(pivot, quicksort(right));
 };
+
+function downloadFile() {
+
+    // get info
+    const image_type = document.getElementById('save_as').value;
+    const save_input = document.getElementById('save_input_image').checked;
+    const save_output = document.getElementById('save_output_image').checked;
+
+    if (!save_input && !save_output) {
+        alert('Bitte wähle mindestens eines der beiden Bilder über die Checkbox aus');
+    }
+    
+    if (save_input) {
+        save_image('input', image_type);
+    }
+
+    if (save_output) {
+        save_image('output', image_type);
+    }
+}
+
+function save_image(image_source, image_type) {
+    
+    switch(image_source) {
+        case 'input':
+            if (!currentPicture) {
+                alert('Es liegt kein Input Bild vor');
+                return;
+            }
+            break;
+        case 'output':
+            if (!filteredPicture) {
+                alert('Es liegt kein Output Bild vor');
+                return;
+            }
+            break;
+    }
+    
+    switch(image_type) {
+        case 'pgm':
+            save_pgm(image_source);
+            break;
+        case 'ppm':
+            save_ppm(image_source);
+            break;
+        case 'jpg':
+            save_jpg(image_source);
+            break;
+        case 'png':
+            save_png(image_source);
+            break;
+    }
+}
+
+function save_pgm(image_source) {
+    
+    let picture = null;
+    let filtered = '';
+    
+    switch(image_source) {
+        case 'input':
+            picture = currentPicture;
+            break;
+        case 'output':
+            picture = filteredPicture;
+            filtered = '_gefiltert';    
+            break;
+    }
+
+    let picture_string = 'P2\n';
+    picture_string += picture.width + ' ' + picture.height + '\n';
+    picture_string += picture.maxValue + '\n';
+    for (let y = 0; y < picture.height; y++) {
+        for (let x = 0; x < picture.width; x++) {
+            picture_string += picture.image[y][x] + ' ';
+        }
+        picture_string += '\n';
+    }
+
+    let blob = new Blob([picture_string], {type: 'image/x-portable-graymap'});
+    let url = window.URL.createObjectURL(blob);
+
+    let fileName = document.getElementById('ict-fileName').value.trim().replace(/[\\\/:*?"<>|]/g, '') + filtered;
+    fileName = (fileName == '') ? 'Bild.' : fileName + '.';
+
+    let link = document.createElement('a');
+    link.href = url;
+    link.download = fileName + 'pgm';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    window.URL.revokeObjectURL(url);
+}
+
+
+function save_ppm(image_source) {
+    
+    let picture = null;
+    let filtered = '';
+    
+    switch(image_source) {
+        case 'input':
+            picture = currentPicture;
+            break;
+        case 'output':
+            picture = filteredPicture;  
+            filtered = '_gefiltert';   
+            break;
+    }
+
+    let picture_string = 'P3\n';
+    picture_string += picture.width + ' ' + picture.height + '\n';
+    picture_string += picture.maxValue + '\n';
+    for (let y = 0; y < picture.height; y++) {
+        for (let x = 0; x < picture.width; x++) {
+            picture_string += picture.image[y][x][0] + ' ' + picture.image[y][x][1] + ' ' + picture.image[y][x][2] + ' ';
+        }
+        picture_string += '\n';
+    }
+
+    let blob = new Blob([picture_string], {type: 'image/x-portable-pixmap'});
+    let url = window.URL.createObjectURL(blob);
+
+    let fileName = document.getElementById('ict-fileName').value.trim().replace(/[\\\/:*?"<>|]/g, '') + filtered;
+    fileName = (fileName == '') ? 'Bild.' : fileName + '.';
+
+    let link = document.createElement('a');
+    link.href = url;
+    link.download = fileName + 'ppm';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    window.URL.revokeObjectURL(url);
+}
+
+function save_jpg(image_source) {
+    
+    let canvas = null;
+    let filtered = '';
+    
+    switch(image_source) {
+        case 'input':
+            canvas = document.getElementById('original_img');;
+            break;
+        case 'output':
+            canvas = document.getElementById('filtered_img');  
+            filtered = '_gefiltert';   
+            break;
+    }
+
+    let url = canvas.toDataURL('image/jpg');
+
+    let fileName = document.getElementById('ict-fileName').value.trim().replace(/[\\\/:*?"<>|]/g, '') + filtered;
+    fileName = (fileName == '') ? 'Bild.' : fileName + '.';
+
+    let link = document.createElement('a');
+    link.href = url;
+    link.download = fileName + 'jpg';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    window.URL.revokeObjectURL(url);
+}
+
+function save_png(image_source) {
+    
+    let canvas = null;
+    let filtered = '';
+    
+    switch(image_source) {
+        case 'input':
+            canvas = document.getElementById('original_img');;
+            break;
+        case 'output':
+            canvas = document.getElementById('filtered_img');  
+            filtered = '_gefiltert';   
+            break;
+    }
+
+    let url = canvas.toDataURL('image/png');
+
+    let fileName = document.getElementById('ict-fileName').value.trim().replace(/[\\\/:*?"<>|]/g, '') + filtered;
+    fileName = (fileName == '') ? 'Bild.' : fileName + '.';
+
+    let link = document.createElement('a');
+    link.href = url;
+    link.download = fileName + 'png';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    window.URL.revokeObjectURL(url);
+}

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="../CSS/fontawesome/css/all.min.css">               <!-- keep this for fontawesome icons (save, load, ...) -->
+        <link rel="stylesheet" href="../CSS/InteractiveCodingTemplate.css">             <!-- keep this for the representation of the tool -->
+        <link rel="stylesheet" href="../CSS/MyTerrainCreator.css">
+        <script src="../JavaScript/InteractiveCodingTemplate.js"></script>              <!-- keep this for the basic javascript functionalities -->
+        <script src="../JavaScript/MyTerrainCreator.js"></script>
+    </head>
+
+    <!-- START MODALS -->
+    <div class="ict-modal" id="save_modal">
+        <div class="ict-modal-content">
+            <div class="ict-modal-header">
+                <span class="ict-close" onclick="closeModal('save_modal')">
+                    &times;
+                </span>
+                <h2>
+                    Speichern
+                </h2>
+            </div>
+            <div class="ict-modal-body">
+                <p>   
+                    <label for="save_as">
+                        Heightmap/Texturemap speichern als:
+                    </label>
+                    <select id="save_as">
+                        <option value="pgm_ppm">
+                            PGM/PPM
+                        </option>
+                        <option value="jpg">
+                            JPG
+                        </option>
+                        <option value="png">
+                            PNG
+                        </option>
+                    </select> 
+                </p>   
+                <p>
+                    <div class="ict-option_item">
+                        <label for="save_heightmap">
+                            Heightmap speichern
+                        </label>
+                        <input type="checkbox" id="save_heightmap" checked/>
+                    </div>
+                </p>
+                <p>
+                    <div class="ict-option_item">
+                        <label for="save_texturemap">
+                            Texturemap speichern
+                        </label>
+                        <input type="checkbox" id="save_texturemap" checked/>
+                    </div>
+                </p>
+                <p>
+                    <div class="ict-option_item">
+                        <label for="save_terrain">
+                            Terrain speichern
+                        </label>
+                        <input type="checkbox" id="save_terrain" checked/>
+                    </div>
+                </p>
+            </div>
+            <div class="ict-modal-footer">
+                <div class="spacer" style="clear: both;"></div>
+                <button onclick="tryFileDownload(); closeModal('save_modal');" class="ict-modal-save" title="speicher gewählte Daten">
+                    <i class="fa-solid fa-floppy-disk fa-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </div> 
+
+    <div class="ict-modal" id="new_canvas_modal">
+        <div class="ict-modal-content">
+            <div class="ict-modal-header">
+                <span class="ict-close" onclick="closeModal('new_canvas_modal')">
+                    &times;
+                </span>
+                <h2>
+                    Neue Heightmap und Texturemap erstellen
+                </h2>
+            </div>
+            <div class="ict-modal-body">
+                <div class="ict-box">
+                    <h2>
+                        Heightmap
+                    </h2>
+                    <div class="ict-option_items">
+                        <div class="ict-option_item">
+                            <label for="new_heightmap_name">
+                                Dateiname
+                            </label>
+                            <input id="new_heightmap_name" class="ict-text_input" value="Heightmap"></input>
+                        </div>
+                        <div class="ict-option_item">
+                            <label for="new_heightmap_width">
+                                Breite
+                            </label>
+                            <div class="ict-number_container">
+                                <button onclick="decreaseNumber('new_heightmap_width')" class="decrease_button">-</button>
+                                <input type="number" min="50" max="2160" step="100" class="ict-numbers bigger_width" id="new_heightmap_width" value="1080"/>
+                                <button onclick="increaseNumber('new_heightmap_width')" class="increase_button">+</button>
+                            </div>
+                        </div>
+                        <div class="ict-option_item">
+                            <label for="new_heightmap_height">
+                                Höhe
+                            </label>
+                            <div class="ict-number_container">
+                                <button onclick="decreaseNumber('new_heightmap_height')" class="decrease_button">-</button>
+                                <input type="number" min="50" max="2160" step="100" class="ict-numbers bigger_width" id="new_heightmap_height" value="1080"/>
+                                <button onclick="increaseNumber('new_heightmap_height')" class="increase_button">+</button>
+                            </div>
+                        </div>
+                        <div class="ict-option_item">
+                            <label for="create_new_heightmap">
+                                neue Heightmap erstellen
+                            </label>
+                            <input type="checkbox" id="create_new_heightmap"/>
+                        </div>
+                    </div>
+                    <h2>
+                        Texturemap
+                    </h2>
+                    <div class="ict-option_items">
+                        <div class="ict-option_item">
+                            <label for="new_texturemap_name">
+                                Dateiname
+                            </label>
+                            <input id="new_texturemap_name" class="ict-text_input" value="Texturemap"></input>
+                        </div>
+                        <div class="ict-option_item">
+                            <label for="new_texturemap_width">
+                                Breite
+                            </label>
+                            <div class="ict-number_container">
+                                <button onclick="decreaseNumber('new_texturemap_width')" class="decrease_button">-</button>
+                                <input type="number" min="50" max="2160" step="100" class="ict-numbers bigger_width" id="new_texturemap_width" value="1080"/>
+                                <button onclick="increaseNumber('new_texturemap_width')" class="increase_button">+</button>
+                            </div>
+                        </div>
+                        <div class="ict-option_item">
+                            <label for="new_texturemap_height">
+                                Höhe
+                            </label>
+                            <div class="ict-number_container">
+                                <button onclick="decreaseNumber('new_texturemap_height')" class="decrease_button">-</button>
+                                <input type="number" min="50" max="2160" step="100" class="ict-numbers bigger_width" id="new_texturemap_height" value="1080"/>
+                                <button onclick="increaseNumber('new_texturemap_height')" class="increase_button">+</button>
+                            </div>
+                        </div>
+                        <div class="ict-option_item">
+                            <label for="create_new_texturemap">
+                                neue Texturemap erstellen
+                            </label>
+                            <input type="checkbox" id="create_new_texturemap"/>
+                        </div>
+                    </div>
+                </div>  
+            </div>
+            <div class="ict-modal-footer">
+                <div class="spacer" style="clear: both;"></div>
+                <button onclick="createNewCanvas(); closeModal('new_canvas_modal');" class="ict-modal-save" title="erstelle Heightmap">
+                    <i class="fa-solid fa-square-check fa-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </div> 
+    <!-- END MODALS -->
+
+    <body>   
+        <div class="ict-range">
+            <div class="ict-header">
+                <h1>
+                    MyTerrainCreator
+                </h1>
+
+                <div id="heightmap_mode">
+                    <div class="ict-subHeader">
+                        <h2>
+                            Heightmap Modus
+                        </h2>
+                    </div>
+                    <div class="ict-subHeader">
+                        <div class="ict-subHeaderItem">
+                            <label for="ict-fileName">
+                                Dateiname
+                            </label>
+                            <input id="ict-fileName" value="Heightmap"></input>
+                        </div>
+                        <div class="ict-subHeaderItem">
+                            <label for="ict-fileWidth">
+                                Breite
+                            </label>
+                            <input type="number" id="ict-fileWidth" value="" readonly></input>
+                        </div>
+                        <div class="ict-subHeaderItem">
+                            <label for="ict-fileHeight">
+                                Höhe
+                            </label>
+                            <input type="number" id="ict-fileHeight" value="" readonly></input>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="texturemap_mode" style="display: none">
+                    <div class="ict-subHeader">
+                        <h2>
+                            Texturemap Modus
+                        </h2>
+                    </div>
+                    <div class="ict-subHeader">
+                        <div class="ict-subHeaderItem">
+                            <label for="ict-fileName_texturemap">
+                                Dateiname
+                            </label>
+                            <input id="ict-fileName_texturemap" value="Texturemap"></input>
+                        </div>
+                        <div class="ict-subHeaderItem">
+                            <label for="ict-fileWidth_texturemap">
+                                Breite
+                            </label>
+                            <input type="number" id="ict-fileWidth_texturemap" value="" readonly></input>
+                        </div>
+                        <div class="ict-subHeaderItem">
+                            <label for="ict-fileHeight_texturemap">
+                                Höhe
+                            </label>
+                            <input type="number" id="ict-fileHeight_texturemap" value="" readonly></input>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ict-menu">
+                    <button onclick="openModal('save_modal')" id="download_button">
+                        <i class="fa-solid fa-floppy-disk fa-2xl"></i>
+                    </button>
+                    <button>
+                        <label for="file-upload" class="file_upload_label">
+                            <i class="fa-solid fa-folder-open fa-2xl"></i>
+                        </label>
+                        <input type="file" data-type="heightmap" id="file-upload" class="file_uploader" onchange="tryFileUpload()"/>  
+                    </button>
+                    <button onclick="openModal('new_canvas_modal')" id="create_new_canvas" title="neue Heightmap erstellen">
+                        <i class="fa-solid fa-file fa-2xl"></i>
+                    </button>
+                    <button onclick="toggleView('100%', '0%')" title="Heightmap Editor maximieren">
+                        <i class="fa-solid fa-arrow-right fa-2xl"></i>
+                    </button>
+                    <button onclick="toggleView('50%', '50%')" title="Split Screen">
+                        <i class="fa-solid fa-arrows-left-right fa-2xl"></i>
+                    </button>
+                    <button onclick="toggleView('0%', '100%')" title="Terrain Preview maximieren">
+                        <i class="fa-solid fa-arrow-left fa-2xl"></i>
+                    </button>
+                    <button onclick="display()" title="Code visualisieren">
+                        <i class="fa-solid fa-code fa-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="ict-content">
+                <div class="ict-codingSpace">
+                    <div class="canvas_wrapper">
+                        <nav class="sidebar">
+                            <ul class="sidebar-nav">
+                                <li class="nav-item">
+                                    <button id="menuButton">
+                                        <i class="fa-solid fa-bars fa-2xl"></i>
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button id="undoButton">
+                                        <i class="fa-solid fa-clock-rotate-left fa-2xl"></i>
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button id="redoButton">
+                                        <i class="fa-solid fa-clock-rotate-left fa-flip-horizontal fa-2xl"></i>
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button id="eraserButton">
+                                        <i class="fa-solid fa-eraser fa-2xl"></i>
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button id="texturemapButton">
+                                        <i class="fa-solid fa-image fa-2xl"></i>
+                                    </button>
+                                </li>
+                            </ul>
+                        </nav>
+                        <div class="my_terrain_menu" style="display: none">
+                            <div class="ict-wrapper">
+                                <div class="ict-box">
+                                    <h2>
+                                        Pinsel-Optionen
+                                    </h2>
+                                    <div class="ict-option_items">
+                                        <div class="ict-option_item" id="heightmap_color_div">
+                                            <label for="height_color">
+                                                Grauwert
+                                            </label>
+                                            <input type="color" id="height_color_preview" value="#ffffff" disabled/>
+                                            <div class="ict-number_container">
+                                                <button onclick="decreaseNumber('height_color')" class="decrease_button">-</button>
+                                                <input type="number" min="0" max="255" step="15" class="ict-numbers" id="height_color" value="255"/>
+                                                <button onclick="increaseNumber('height_color')" class="increase_button">+</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="ict-option_item" id="texturemap_color_div" style="display: none">
+                                            <label for="texture_color">
+                                                Farbe
+                                            </label>
+                                            <input type="color" id="texture_color" value="#000000"/>
+                                        </div>
+                                        
+                                        <div class="ict-option_item">
+                                            <label for="opacity">
+                                                Deckkraft (%)
+                                            </label>
+                                            <div class="ict-number_container">
+                                                <button onclick="decreaseNumber('opacity')" class="decrease_button">-</button>
+                                                <input type="number" min="1" max="100" step="10" class="ict-numbers" id="opacity" value="100"/>
+                                                <button onclick="increaseNumber('opacity')" class="increase_button">+</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="ict-option_item">
+                                            <label for="brushSize">
+                                                Pinselgröße (px)
+                                            </label>
+                                            <div class="ict-number_container">
+                                                <button onclick="decreaseNumber('brushSize')" class="decrease_button">-</button>
+                                                <input type="number" min="0" max="100" step="10" class="ict-numbers" id="brushSize" value="25"/>
+                                                <button onclick="increaseNumber('brushSize')" class="increase_button">+</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="ict-option_item">
+                                            <label for="falloff">
+                                                weicher Pinsel
+                                            </label>
+                                            <input type="checkbox" id="falloff"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="canvas_container" oncontextmenu="return false;">
+                            <canvas id="heightmap" width="1080" height="1080">
+
+                            </canvas>
+                            <canvas id="texturemap" width="1080" height="1080" style="display: none">
+
+                            </canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="ict-previewSpace">
+                    <div class="ict-wrapper">
+                        <div class="ict-display">
+                            <canvas id="terrain_preview_canvas">
+
+                            </canvas>
+                            <script type="module" src="../JavaScript/MyTerrainPreview.js"></script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

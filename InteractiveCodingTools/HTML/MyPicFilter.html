@@ -7,14 +7,81 @@
         <script src="../JavaScript/InteractiveCodingTemplate.js"></script>              <!-- keep this for the basic javascript functionalities -->
         <script src="../JavaScript/MyPicFilter.js"></script>
     </head>
-    <body>   
+
+    <!-- START MODALS -->
+    <div class="ict-modal" id="save_modal">
+        <div class="ict-modal-content">
+            <div class="ict-modal-header">
+                <span class="ict-close" onclick="closeModal('save_modal')">
+                    &times;
+                </span>
+                <h2>
+                    Speichern
+                </h2>
+            </div>
+            <div class="ict-modal-body">
+                <p>   
+                    <label for="save_as">
+                        Speichern als:
+                    </label>
+                    <select id="save_as">
+                        <option value="pgm">
+                            PGM
+                        </option>
+                        <option value="ppm">
+                            PPM
+                        </option>
+                        <option value="jpg">
+                            JPG
+                        </option>
+                        <option value="png">
+                            PNG
+                        </option>
+                    </select> 
+                </p>   
+                <p>
+                    <div class="ict-option_item">
+                        <label for="save_input_image">
+                            Eingabebild speichern
+                        </label>
+                        <input type="checkbox" id="save_input_image"/>
+                    </div>
+                </p>
+                <p>
+                    <div class="ict-option_item">
+                        <label for="save_output_image">
+                            gefiltertes Bild speichern 
+                        </label>
+                        <input type="checkbox" id="save_output_image" checked/>
+                    </div>
+                </p>
+            </div>
+            <div class="ict-modal-footer">
+                <div class="spacer" style="clear: both;"></div>
+                <button onclick="tryFileDownload(); closeModal('save_modal');" class="ict-modal-save">
+                    <i class="fa-solid fa-floppy-disk fa-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </div> 
+    <!-- END MODALS -->
+
+    <body>  
         <div class="ict-range">
             <div class="ict-header">
                 <h1>
                     MyPicFilter
                 </h1>
+                <div class="ict-subHeader">
+                    <div class="ict-subHeaderItem">
+                        <label for="ict-fileName">
+                            Dateiname
+                        </label>
+                        <input id="ict-fileName" value=""></input>
+                    </div>
+                </div>
                 <div class="ict-menu">
-                    <button onclick="tryFileDownload()" id="download_button">
+                    <button onclick="openModal('save_modal')" id="download_button">
                         <i class="fa-solid fa-floppy-disk fa-2xl"></i>
                     </button>
                     <button id="upload_button">

@@ -1,6 +1,7 @@
 /* This part is just for visuals (adding line numbers, adjusting textarea height, ...) */
 // add line numbers to our editor
 document.addEventListener('DOMContentLoaded', function(){
+    initIctNumbers();
     try {
         const editor = document.querySelector('.ict-editor');
         const textarea = document.querySelector('.ict-code');
@@ -30,6 +31,61 @@ document.addEventListener('DOMContentLoaded', function(){
 
     }
 });
+
+function initIctNumbers() {
+    const number_inputs = document.querySelectorAll('.ict-numbers');
+
+    number_inputs.forEach(element => {
+        element.addEventListener('change', checkNumberValue);
+    });
+}
+
+const default_min = 1;
+const default_max = 100;
+
+function checkNumberValue() {
+    const min_value = isNaN(parseInt(this.min)) ? default_min : parseInt(this.min);
+    const max_value = isNaN(parseInt(this.max)) ? default_max : parseInt(this.max);
+    const curr_value = isNaN(parseInt(this.value)) ? min_value : parseInt(this.value);
+
+    const new_value = Math.max(min_value, Math.min(max_value, curr_value))
+    this.value = new_value;
+}
+
+function decreaseNumber(id) {
+    const number_input = document.getElementById(id);
+    const min_value = isNaN(parseInt(number_input.min)) ? default_min : parseInt(number_input.min);
+    const curr_value = isNaN(parseInt(number_input.value)) ? min_value : parseInt(number_input.value);
+    const step = isNaN(parseInt(number_input.step)) ? 1 : parseInt(number_input.step);
+
+    const new_value = (curr_value - step < min_value) ? min_value : curr_value - step;
+    number_input.value = new_value;
+
+    try {
+        handleDecrease(id);
+    }
+    catch{
+
+    }
+}
+
+function increaseNumber(id) {
+    const number_input = document.getElementById(id);
+    const max_value = isNaN(parseInt(number_input.max)) ? default_max : parseInt(number_input.max);
+    const curr_value = isNaN(parseInt(number_input.value)) ? max_value : parseInt(number_input.value);
+
+    const step = isNaN(parseInt(number_input.step)) ? 1 : parseInt(number_input.step);
+
+    const new_value = (curr_value + step > max_value) ? max_value : curr_value + step;
+    number_input.value = new_value;
+
+    try {
+        handleIncrease(id);
+    }
+    catch{
+
+    }
+}
 
 // Dealing with Textarea Height
 function calcHeight(value) {
@@ -94,34 +150,14 @@ function tryFileDownload() {
     }
 }
 
-function decreaseNumber(id) {
-    const number_input = document.getElementById(id);
-    const curr_value = parseInt(number_input.value);
-    const min_value = parseInt(number_input.min);
+function openModal(modal_id) {
+    const modal = document.getElementById(modal_id);
 
-    const new_value = (curr_value - 1 < min_value) ? min_value : curr_value - 1;
-    number_input.value = new_value;
-
-    try {
-        handleDecrease(id);
-    }
-    catch{
-
-    }
+    modal.style.display = 'block';
 }
 
-function increaseNumber(id) {
-    const number_input = document.getElementById(id);
-    const curr_value = parseInt(number_input.value);
-    const max_value = parseInt(number_input.max);
+function closeModal(modal_id) {
+    const modal = document.getElementById(modal_id);
 
-    const new_value = (curr_value + 1 > max_value) ? max_value : curr_value + 1;
-    number_input.value = new_value;
-
-    try {
-        handleIncrease(id);
-    }
-    catch{
-
-    }
+    modal.style.display = 'none';
 }
