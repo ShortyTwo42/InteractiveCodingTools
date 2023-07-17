@@ -806,8 +806,8 @@ function uploadFile() {
                         return;
                     }
                     canvas = heightmap;
-                    document.getElementById('ict-fileWidth').value = picInfo.width;
-                    document.getElementById('ict-fileHeight').value = picInfo.height;
+                    document.getElementById('ict-fileWidth').value = fileInfo.width;
+                    document.getElementById('ict-fileHeight').value = fileInfo.height;
                     break;
                 case 'texturemap':
                     if (fileInfo.type == 'pgm') {
@@ -815,8 +815,8 @@ function uploadFile() {
                         return;
                     }
                     canvas = texturemap;
-                    document.getElementById('ict-fileWidth_texturemap').value = picInfo.width;
-                    document.getElementById('ict-fileHeight_texturemap').value = picInfo.height;
+                    document.getElementById('ict-fileWidth_texturemap').value = fileInfo.width;
+                    document.getElementById('ict-fileHeight_texturemap').value = fileInfo.height;
                     break;
             }
         

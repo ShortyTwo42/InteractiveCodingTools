@@ -47,6 +47,11 @@
     color: var(--active_elem);
 }
 
+#terrain_preview_canvas {
+    width: 100%;
+    height: 100%;
+}
+
 
 /* Custom Scrollbar */
 .canvas_container::-webkit-scrollbar {
