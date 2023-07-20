@@ -1,5 +1,22 @@
+import { 
+    update_terrain_heightmap, 
+    update_terrain_texture, 
+    update_terrain_geometry,
+    update_terrain_material, 
+    update_textures
+} from 'modules/MyTerrainPreview.js';
+
 // initialize everything
 document.addEventListener('DOMContentLoaded', function() {
+    // set functions from other module and make them visible outside of this modal
+    window.update_terrain_heightmap = update_terrain_heightmap;
+    window.update_terrain_texture = update_terrain_texture;
+    window.update_terrain_geometry = update_terrain_geometry;
+    window.handleDecrease = handleDecrease;
+    window.handleIncrease = handleIncrease;
+    window.downloadFile = downloadFile;
+    window.uploadFile = uploadFile;
+    window.createNewCanvas = createNewCanvas;
     initDrawingApp();
 });
 
@@ -145,7 +162,7 @@ function initDrawingApp() {
     // Set up event listeners for UI elements
     menuButton.addEventListener('click', toggleSidebar);
     heightColorInput.addEventListener('input', updateColor);
-    textureColorInput.addEventListener('change', updateColor);
+    textureColorInput.addEventListener('input', updateColor);
     opacityInput.addEventListener('input', updateOpacity);
     brushSizeInput.addEventListener('input', updateBrushSize);
     falloffCheckbox.addEventListener('change', updateFalloff);
@@ -212,6 +229,8 @@ function draw(e) {
 
                 lastHeightmapX = mousePos.x;
                 lastHeightmapY = mousePos.y;
+
+                update_terrain_heightmap();
                 break;
             case 'texturemap':
                 lastX = lastTexturemapX;
@@ -219,6 +238,8 @@ function draw(e) {
 
                 lastTexturemapX = mousePos.x;
                 lastTexturemapY = mousePos.y;
+
+                update_terrain_texture();
                 break;
         }
 
@@ -234,6 +255,15 @@ function stopDrawing(e) {
     if (e.button === 0) {
         e.preventDefault();
         isDrawing = false;
+
+        // switch(active_type) {
+        //     case 'heightmap':
+        //         update_terrain_heightmap();
+        //         break;
+        //     case 'texturemap':
+        //         update_terrain_texture();
+        //         break;
+        // }
     }
 }
 
@@ -532,6 +562,18 @@ function handleDecrease(id) {
         case 'height_color':
             updateColor();
             break;
+        case 'resolution_x':
+            update_terrain_geometry();
+            break;
+        case 'resolution_y':
+            update_terrain_geometry();
+            break;
+        case 'terrain_scale':
+            update_terrain_geometry();
+            break;
+        case 'displacement_scale':
+            update_terrain_material();
+            break;
     }
 }
 
@@ -545,6 +587,18 @@ function handleIncrease(id) {
             break;
         case 'height_color':
             updateColor();
+            break;
+        case 'resolution_x':
+            update_terrain_geometry();
+            break;
+        case 'resolution_y':
+            update_terrain_geometry();
+            break;
+        case 'terrain_scale':
+            update_terrain_geometry();
+            break;
+        case 'displacement_scale':
+            update_terrain_material();
             break;
     }
 }
@@ -589,6 +643,8 @@ function createNewCanvas() {
         texturemap_ctx.fillStyle = '#ffffff';
         texturemap_ctx.fillRect(0, 0, texturemap.width, texturemap.height);  
     }
+
+    update_textures();
     
     //////////////////// reset brush parameters to current values ///////////////////
     updateColor();
@@ -607,11 +663,6 @@ function downloadFile() {
     const save_heightmap = document.getElementById('save_heightmap').checked;
     const save_texturemap = document.getElementById('save_texturemap').checked;
     const save_terrain = document.getElementById('save_terrain').checked;
-
-    console.log('Save heightmap as: ' + image_type);
-    console.log('Save heightmap: ' + save_heightmap);
-    console.log('Save texturemap: ' + save_texturemap);
-    console.log('Save terrain geometry: ' + save_terrain);
 
     if (!save_heightmap && !save_texturemap && !save_terrain) {
         alert('Bitte wähle mindestens eine der Speichermöglichkeiten über die Checkbox aus');
@@ -773,7 +824,7 @@ function save_geometry() {
     console.log('not yet implemented');
 }
 
-function uploadFile() {
+export function uploadFile() {
 
     let file = document.getElementById('file-upload').files[0];
     
@@ -807,10 +858,6 @@ function uploadFile() {
                     document.getElementById('ict-fileHeight').value = fileInfo.height;
                     break;
                 case 'texturemap':
-                    if (fileInfo.type == 'pgm') {
-                        alert('Für Heightmaps muss das Format "ppm" verwendet werden');
-                        return;
-                    }
                     canvas = texturemap;
                     ctx = texturemap_ctx;
                     document.getElementById('ict-fileWidth_texturemap').value = fileInfo.width;
@@ -832,6 +879,8 @@ function uploadFile() {
                     pngToCanvas(canvas, ctx, buffer);
                     break;
             }
+
+            update_textures();
         }
         
         reader.readAsArrayBuffer(file);

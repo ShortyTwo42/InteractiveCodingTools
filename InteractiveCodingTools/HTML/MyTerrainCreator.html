@@ -5,16 +5,17 @@
         <link rel="stylesheet" href="../CSS/InteractiveCodingTemplate.css">             <!-- keep this for the representation of the tool -->
         <link rel="stylesheet" href="../CSS/MyTerrainCreator.css">
         <script src="../JavaScript/InteractiveCodingTemplate.js"></script>              <!-- keep this for the basic javascript functionalities -->
-        <script src="../JavaScript/MyTerrainCreator.js"></script>
         <script type="importmap">
             {
                 "imports": {
                     "three": "../ThreeJS/node_modules/three/build/three.module.js",
-                    "three/examples/": "../ThreeJS/node_modules/three/examples/"
+                    "three/examples/": "../ThreeJS/node_modules/three/examples/",
+                    "modules/": "../JavaScript/"
                 }
             }
         </script>
         <script type="module" src="../JavaScript/MyTerrainPreview.js"></script>
+        <script type="module" src="../JavaScript/MyTerrainCreator.js"></script>
     </head>
 
     <!-- START MODALS -->
@@ -353,6 +354,61 @@
                                             </label>
                                             <input type="checkbox" id="falloff"/>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="ict-box">
+                                    <h2>
+                                        Terrain-Optionen
+                                    </h2>
+                                    <div class="ict-option_item">
+                                        <label for="resolution_x">
+                                            Terrain Auflösung X
+                                        </label>
+                                        <div class="ict-number_container">
+                                            <button onclick="decreaseNumber('resolution_x')" class="decrease_button">-</button>
+                                            <input type="number" min="2" max="100" step="10" class="ict-numbers" id="resolution_x" value="50"/>
+                                            <button onclick="increaseNumber('resolution_x')" class="increase_button">+</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="ict-option_item">
+                                        <label for="resolution_x">
+                                            Terrain Auflösung Y
+                                        </label>
+                                        <div class="ict-number_container">
+                                            <button onclick="decreaseNumber('resolution_y')" class="decrease_button">-</button>
+                                            <input type="number" min="2" max="100" step="10" class="ict-numbers" id="resolution_y" value="50"/>
+                                            <button onclick="increaseNumber('resolution_y')" class="increase_button">+</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="ict-option_item">
+                                        <label for="terrain_scale">
+                                            Terrain Skalierung
+                                        </label>
+                                        <div class="ict-number_container">
+                                            <button onclick="decreaseNumber('terrain_scale')" class="decrease_button">-</button>
+                                            <input type="number" min="1" max="100" step="10" class="ict-numbers" id="terrain_scale" value="1"/>
+                                            <button onclick="increaseNumber('terrain_scale')" class="increase_button">+</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="ict-option_item">
+                                        <label for="displacement_scale">
+                                            Höhenmap Skalierung
+                                        </label>
+                                        <div class="ict-number_container">
+                                            <button onclick="decreaseNumber('displacement_scale')" class="decrease_button">-</button>
+                                            <input type="number" min="1" max="100" step="10" class="ict-numbers" id="displacement_scale" value="1"/>
+                                            <button onclick="increaseNumber('displacement_scale')" class="increase_button">+</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="ict-option_item">
+                                        <label for="wireframe">
+                                            Wireframe
+                                        </label>
+                                        <input type="checkbox" id="wireframe"/>
                                     </div>
                                 </div>
                             </div>
