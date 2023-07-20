@@ -158,11 +158,6 @@ function initDrawingApp() {
     active_type = 'heightmap';
     active_canvas = heightmap;
     active_ctx = heightmap_ctx;
-
-    // DEBUG
-    // active_type = 'texturemap';
-    // active_canvas = texturemap;
-    // active_ctx = texturemap_ctx;
 }
 
 // drawing functions
@@ -787,9 +782,9 @@ function uploadFile() {
 
         // define what should be done with the raw text once it is read
         reader.onload = function(e) {
-            let content = e.target.result;
-
-            let fileInfo = prepareFile(content, active_type);
+            const buffer = e.target.result;
+            const uint8Array = new Uint8Array(buffer);
+            const fileInfo = prepareFile(uint8Array);
 
             if (fileInfo.image == -1) {
                 // wrong format or couldn't process data
@@ -799,6 +794,7 @@ function uploadFile() {
 
             // get relevant canvas
             let canvas = null;
+            let ctx = null;
             switch (active_type) {
                 case 'heightmap':
                     if (fileInfo.type == 'ppm') {
@@ -806,6 +802,7 @@ function uploadFile() {
                         return;
                     }
                     canvas = heightmap;
+                    ctx = heightmap_ctx;
                     document.getElementById('ict-fileWidth').value = fileInfo.width;
                     document.getElementById('ict-fileHeight').value = fileInfo.height;
                     break;
@@ -815,20 +812,30 @@ function uploadFile() {
                         return;
                     }
                     canvas = texturemap;
+                    ctx = texturemap_ctx;
                     document.getElementById('ict-fileWidth_texturemap').value = fileInfo.width;
                     document.getElementById('ict-fileHeight_texturemap').value = fileInfo.height;
                     break;
             }
         
-            if (fileInfo.type == 'pgm') {
-                pgmToCanvas(canvas, fileInfo);
-            }
-            else if (fileInfo.type == 'ppm') {
-                ppmToCanvas(canvas, fileInfo);
+            switch(fileInfo.type) {
+                case 'pgm':
+                    pgmToCanvas(canvas, fileInfo);
+                    break;
+                case 'ppm':
+                    ppmToCanvas(canvas, fileInfo);
+                    break;
+                case 'jpg':
+                    jpgToCanvas(canvas, ctx, buffer);
+                    break;
+                case 'png':
+                    pngToCanvas(canvas, ctx, buffer);
+                    break;
             }
         }
+        
+        reader.readAsArrayBuffer(file);
 
-        reader.readAsText(file);
         // cuts off file extension
         const fileName = file.name.split('.').slice(0, -1).join('.');
 
@@ -843,19 +850,41 @@ function uploadFile() {
     }
 }
 
-function prepareFile(file) {
+// function to skip all leading white spaces in the file
+function skipWhiteSpace(uint8Array) {
+    let index = 0;
+    while (index < uint8Array.length && (uint8Array[index] === 0x20 || uint8Array[index] === 0x09 || uint8Array[index] === 0x0A || uint8Array[index] === 0x0D)) {
+        index++;
+    }
+    return index;
+}
+
+function prepareFile(uint8Array) {
     let fileInfo = {};
+    let file = null;
     
-    file = file.trim();
+    let startIndex = skipWhiteSpace(uint8Array);
+
+    // Check the first few bytes of the file after skipping white spaces
+    const isPPM = uint8Array[startIndex] === 0x50 && uint8Array[startIndex + 1] === 0x33; // PPM starts with "P3" or "P6"
+    const isPGM = uint8Array[startIndex] === 0x50 && uint8Array[startIndex + 1] === 0x32; // PGM starts with "P2" or "P5"
+    const isJPG = uint8Array[startIndex] === 0xFF && uint8Array[startIndex + 1] === 0xD8; // JPG starts with 0xFFD8
+    const isPNG = uint8Array[startIndex] === 0x89 && uint8Array[startIndex + 1] === 0x50 && uint8Array[startIndex + 2] === 0x4E && uint8Array[startIndex + 3] === 0x47; // PNG starts with PNG signature
 
     let type = -1;
-
-    if (file.startsWith('P2')) {
-        type = 'pgm';
-    } 
-    else if (file.startsWith('P3')) {
+    if (isPPM) {
         type = 'ppm';
-    }
+        file = new TextDecoder().decode(uint8Array);
+        file = file.trim();
+    } else if (isPGM) {
+        type = 'pgm';
+        file = new TextDecoder().decode(uint8Array);
+        file = file.trim();
+    } else if (isJPG) {
+        type = 'jpg';
+    } else if (isPNG) {
+        type = 'png';
+    } 
 
     fileInfo.type = type;
 
@@ -970,4 +999,74 @@ function ppmToCanvas(canvas, picInfo) {
             context.fillRect(x, y, 1, 1);
         }
     } 
+}
+
+function jpgToCanvas(canvas, ctx, buffer) {
+    const blob = new Blob([buffer], {type: 'image/jpg'});
+    const imageURL = URL.createObjectURL(blob);
+
+    const image = new Image();
+
+    image.onload = async function() {
+        canvas.width = image.width;
+        canvas.height = image.height;
+
+        switch (active_type) {
+            case 'heightmap':
+                const imageBitmap = await createImageBitmap(image);
+                ctx.filter = 'grayscale(100%)';
+                ctx.drawImage(imageBitmap, 0, 0);
+                document.getElementById('ict-fileWidth').value = image.width;
+                document.getElementById('ict-fileHeight').value = image.height; 
+                break;
+            case 'texturemap':
+                ctx.drawImage(image, 0, 0);   
+                document.getElementById('ict-fileWidth_texturemap').value = image.width;
+                document.getElementById('ict-fileHeight_texturemap').value = image.height;    
+                break;
+        }
+
+        URL.revokeObjectURL(imageURL);
+    }
+
+    image.onerror = function() {
+        alert('Bild konnte nicht geladen werden');
+    };
+
+    image.src = imageURL;
+}
+
+function pngToCanvas(canvas, ctx, buffer) {
+    const blob = new Blob([buffer], {type: 'image/png'});
+    const imageURL = URL.createObjectURL(blob);
+
+    const image = new Image();
+
+    image.onload = async function() {
+        canvas.width = image.width;
+        canvas.height = image.height;
+
+        switch (active_type) {
+            case 'heightmap':
+                const imageBitmap = await createImageBitmap(image);
+                ctx.filter = 'grayscale(100%)';
+                ctx.drawImage(imageBitmap, 0, 0);
+                document.getElementById('ict-fileWidth').value = image.width;
+                document.getElementById('ict-fileHeight').value = image.height; 
+                break;
+            case 'texturemap':
+                ctx.drawImage(image, 0, 0);   
+                document.getElementById('ict-fileWidth_texturemap').value = image.width;
+                document.getElementById('ict-fileHeight_texturemap').value = image.height;    
+                break;
+        }
+
+        URL.revokeObjectURL(imageURL);
+    }
+
+    image.onerror = function() {
+        alert('Bild konnte nicht geladen werden');
+    };
+
+    image.src = imageURL;
 }

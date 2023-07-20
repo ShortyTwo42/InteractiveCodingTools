@@ -19,49 +19,81 @@ function uploadFile() {
 
         // define what should be done with the raw text once it is read
         reader.onload = function(e) {
-            let content = e.target.result;
-
-            let fileInfo = prepareFile(content);
+            const buffer = e.target.result;
+            const uint8Array = new Uint8Array(buffer);
+            const fileInfo = prepareFile(uint8Array);
 
             if (fileInfo.image == -1) {
                 // wrong format or couldn't process data
-                alert('Das Format wurde nicht erkannt oder es gab Probleme beim Auslesen der Daten, bitte versuchen Sie es mit einer anderen Datei vom Typen "pgm" oder "ppm"')
+                alert('Das Format wurde nicht erkannt oder es gab Probleme beim Auslesen der Daten, bitte versuchen Sie es mit einer anderen Datei vom Typen ".pgm", ".ppm", ".jpg" oder ".pgm"')
                 return;
             }
 
-            currentPicture = fileInfo;
-
             // set pixel values of canvas element
-            let canvas = document.getElementById('original_img');
-        
-            if (currentPicture.type == 'pgm') {
-                pgmToCanvas(canvas, currentPicture);
-            }
-            else if (currentPicture.type == 'ppm') {
-                ppmToCanvas(canvas, currentPicture);
+            const canvas = document.getElementById('original_img');
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+            switch(fileInfo.type) {
+                case 'pgm':
+                    currentPicture = fileInfo;
+                    pgmToCanvas(canvas, currentPicture);
+                    break;
+                case 'ppm':
+                    currentPicture = fileInfo;
+                    ppmToCanvas(canvas, currentPicture);
+                    break;
+                case 'jpg':
+                    jpgToCanvas(canvas, ctx, buffer);
+                    break;
+                case 'png':
+                    pngToCanvas(canvas, ctx, buffer);
+                    break;
             }
         }
 
-        reader.readAsText(file);
+        reader.readAsArrayBuffer(file);
+
         // cuts off file extension
         let fileName = file.name.split('.').slice(0, -1).join('.');
         document.getElementById('ict-fileName').value = fileName;
     }
 }
 
-function prepareFile(file) {
+// function to skip all leading white spaces in the file
+function skipWhiteSpace(uint8Array) {
+    let index = 0;
+    while (index < uint8Array.length && (uint8Array[index] === 0x20 || uint8Array[index] === 0x09 || uint8Array[index] === 0x0A || uint8Array[index] === 0x0D)) {
+        index++;
+    }
+    return index;
+}
+
+function prepareFile(uint8Array) {
     let fileInfo = {};
+    let file = null;
     
-    file = file.trim();
+    let startIndex = skipWhiteSpace(uint8Array);
+
+    // Check the first few bytes of the file after skipping white spaces
+    const isPPM = uint8Array[startIndex] === 0x50 && uint8Array[startIndex + 1] === 0x33; // PPM starts with "P3" or "P6"
+    const isPGM = uint8Array[startIndex] === 0x50 && uint8Array[startIndex + 1] === 0x32; // PGM starts with "P2" or "P5"
+    const isJPG = uint8Array[startIndex] === 0xFF && uint8Array[startIndex + 1] === 0xD8; // JPG starts with 0xFFD8
+    const isPNG = uint8Array[startIndex] === 0x89 && uint8Array[startIndex + 1] === 0x50 && uint8Array[startIndex + 2] === 0x4E && uint8Array[startIndex + 3] === 0x47; // PNG starts with PNG signature
 
     let type = -1;
-
-    if (file.startsWith('P2')) {
-        type = 'pgm';
-    } 
-    else if (file.startsWith('P3')) {
+    if (isPPM) {
         type = 'ppm';
-    }
+        file = new TextDecoder().decode(uint8Array);
+        file = file.trim();
+    } else if (isPGM) {
+        type = 'pgm';
+        file = new TextDecoder().decode(uint8Array);
+        file = file.trim();
+    } else if (isJPG) {
+        type = 'jpg';
+    } else if (isPNG) {
+        type = 'png';
+    } 
 
     fileInfo.type = type;
 
@@ -180,6 +212,132 @@ function ppmToCanvas(canvas, picInfo) {
             context.fillStyle = 'rgb(' + picInfo.image[y][x][0] + ', ' + picInfo.image[y][x][1] + ', ' + picInfo.image[y][x][2] + ')';
             context.fillRect(x, y, 1, 1);
         }
+    } 
+}
+
+function jpgToCanvas(canvas, ctx, buffer) {
+    const blob = new Blob([buffer], {type: 'image/jpg'});
+    const imageURL = URL.createObjectURL(blob);
+
+    const image = new Image();
+
+    image.onload = async function() {
+        canvas.width = image.width;
+        canvas.height = image.height;
+
+        ctx.drawImage(image, 0, 0);         
+
+        setFileInfoFromCanvas(canvas, ctx);
+
+        URL.revokeObjectURL(imageURL);
+    }
+
+    image.onerror = function() {
+        alert('Bild konnte nicht geladen werden');
+    };
+
+    image.src = imageURL;
+}
+
+function pngToCanvas(canvas, ctx, buffer) {
+    const blob = new Blob([buffer], {type: 'image/png'});
+    const imageURL = URL.createObjectURL(blob);
+
+    const image = new Image();
+
+    image.onload = async function() {
+        canvas.width = image.width;
+        canvas.height = image.height;
+
+        ctx.drawImage(image, 0, 0);   
+        
+        setFileInfoFromCanvas(canvas, ctx);
+
+        URL.revokeObjectURL(imageURL);
+    }
+
+    image.onerror = function() {
+        alert('Bild konnte nicht geladen werden');
+    };
+
+    image.src = imageURL;
+}
+
+function setFileInfoFromCanvas(canvas, ctx, type) {
+    // check if the image is a grayscale image
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.width).data;
+
+    currentPicture = {};
+
+    currentPicture.width = canvas.width;
+    currentPicture.height = canvas.width;
+    currentPicture.maxValue = 255;
+
+    let isGrayscale = true;
+    for (let i = 0; i < imageData.length; i += 4) {
+        const r = imageData[i];
+        const g = imageData[i + 1];
+        const b = imageData[i + 2];
+
+        if (r !== g || r !== b) {
+            isGrayscale = false;
+            break;
+        }
+    }
+
+    let image = [];
+
+    if (isGrayscale) {
+        currentPicture.type = 'pgm';
+
+        for (let y = 0; y < currentPicture.height; y++) {
+            let newRow = [];
+            for (let x = 0; x < currentPicture.width; x++) {
+                // we only access the red color channel as its a grayscale image
+                const pixel_index = (y * canvas.width + x) * 4;
+                const pixelVal = imageData[pixel_index];
+                
+                newRow.push(pixelVal);
+            }
+            image.push(newRow);
+        }
+        currentPicture.image = image;
+
+        // get rid of download as ppm
+        let save_as = document.getElementById('save_as');
+        let hide_option = save_as.querySelector('option[value=ppm]');
+        let show_option = save_as.querySelector('option[value=pgm]');
+        hide_option.style.display = 'none';
+        show_option.style.display = '';
+        save_as.value = 'pgm';
+    }
+    else {
+        currentPicture.type = 'ppm';
+
+        for (let y = 0; y < currentPicture.height; y++) {
+            let newRow = [];
+            for (let x = 0; x < currentPicture.width; x++) {
+                // we only access the red, green and blue color channel as its a color image (ignore alpha channel)
+                const pixel_index = (y * canvas.width + x) * 4;
+                let rgb = [];
+
+                rgb.push(imageData[pixel_index]);      //r
+                rgb.push(imageData[pixel_index + 1]);  //g
+                rgb.push(imageData[pixel_index + 2]);  //b
+                
+                newRow.push(rgb);
+            }
+            image.push(newRow);
+        }
+        currentPicture.image = image;
+
+        // get rid of download as pgm
+        let save_as = document.getElementById('save_as');
+        let hide_option = save_as.querySelector('option[value=pgm]');
+        let show_option = save_as.querySelector('option[value=ppm]');
+        hide_option.style.display = 'none';
+        show_option.style.display = '';
+        save_as.value = 'ppm';
     } 
 }
 

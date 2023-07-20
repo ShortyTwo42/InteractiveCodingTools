@@ -6,6 +6,15 @@
         <link rel="stylesheet" href="../CSS/MyTerrainCreator.css">
         <script src="../JavaScript/InteractiveCodingTemplate.js"></script>              <!-- keep this for the basic javascript functionalities -->
         <script src="../JavaScript/MyTerrainCreator.js"></script>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "../ThreeJS/node_modules/three/build/three.module.js",
+                    "three/examples/": "../ThreeJS/node_modules/three/examples/"
+                }
+            }
+        </script>
+        <script type="module" src="../JavaScript/MyTerrainPreview.js"></script>
     </head>
 
     <!-- START MODALS -->
@@ -363,7 +372,6 @@
                         <canvas id="terrain_preview_canvas">
 
                         </canvas>
-                        <script type="module" src="../JavaScript/MyTerrainPreview.js"></script>
                     </div>
                 </div>
             </div>
