@@ -182,6 +182,9 @@ function pgmToCanvas(canvas, picInfo) {
     show_option.style.display = '';
     save_as.value = 'pgm';
     
+    document.getElementById('ict-fileWidth').value = picInfo.width;
+    document.getElementById('ict-fileHeight').value = picInfo.height;
+    
     canvas.width = picInfo.width;
     canvas.height = picInfo.height;
     let context = canvas.getContext('2d');
@@ -202,6 +205,9 @@ function ppmToCanvas(canvas, picInfo) {
     hide_option.style.display = 'none';
     show_option.style.display = '';
     save_as.value = 'ppm';
+
+    document.getElementById('ict-fileWidth').value = picInfo.width;
+    document.getElementById('ict-fileHeight').value = picInfo.height;
 
     canvas.width = picInfo.width;
     canvas.height = picInfo.height;
@@ -224,6 +230,9 @@ function jpgToCanvas(canvas, ctx, buffer) {
     image.onload = async function() {
         canvas.width = image.width;
         canvas.height = image.height;
+
+        document.getElementById('ict-fileWidth').value = image.width;
+        document.getElementById('ict-fileHeight').value = image.height;
 
         ctx.drawImage(image, 0, 0);         
 
@@ -248,6 +257,9 @@ function pngToCanvas(canvas, ctx, buffer) {
     image.onload = async function() {
         canvas.width = image.width;
         canvas.height = image.height;
+
+        document.getElementById('ict-fileWidth').value = image.width;
+        document.getElementById('ict-fileHeight').value = image.height;
 
         ctx.drawImage(image, 0, 0);   
         
