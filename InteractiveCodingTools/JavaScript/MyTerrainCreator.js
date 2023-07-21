@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', function() {
     window.handleIncrease = handleIncrease;
     window.downloadFile = downloadFile;
     window.uploadFile = uploadFile;
+    window.toggleAutoRefresh = toggleAutoRefresh;
+    window.display = display;
     window.createNewCanvas = createNewCanvas;
     initDrawingApp();
 });
@@ -42,8 +44,12 @@ let lastTexturemapX = 0;
 let lastTexturemapY = 0;
 let isDrawing = false;
 let brushSize = 25;
+let autorefresh = true;
 let heightmapHistory = [];
+let heightmapStep = -1;
 let texturemapHistory = [];
+let texturemapStep = -1;
+const maxHistoryEntries = 20;
 
 // for zooming and panning
 const minZoom = 0.1;
@@ -84,6 +90,10 @@ function initDrawingApp() {
     // make the background black initially
     heightmap_ctx.fillStyle = '#000000';
     heightmap_ctx.fillRect(0, 0, heightmap.width, heightmap.height);
+    
+    // push initial history entry for heightmap
+    active_type = 'heightmap';
+    pushHistory();
 
     // init brush parameters
     heightmap_ctx.strokeStyle = '#ffffff'; // init as white
@@ -113,6 +123,10 @@ function initDrawingApp() {
     // make the background white initially
     texturemap_ctx.fillStyle = '#ffffff';
     texturemap_ctx.fillRect(0, 0, texturemap.width, texturemap.height);
+
+    // push initial history entry for texturemap
+    active_type = 'texturemap';
+    pushHistory();
 
     // init brush parameters
     texturemap_ctx.strokeStyle = '#000000'; // init as black
@@ -230,7 +244,9 @@ function draw(e) {
                 lastHeightmapX = mousePos.x;
                 lastHeightmapY = mousePos.y;
 
-                update_terrain_heightmap();
+                if (autorefresh) {
+                    update_terrain_heightmap();
+                }
                 break;
             case 'texturemap':
                 lastX = lastTexturemapX;
@@ -239,7 +255,9 @@ function draw(e) {
                 lastTexturemapX = mousePos.x;
                 lastTexturemapY = mousePos.y;
 
-                update_terrain_texture();
+                if (autorefresh) {
+                    update_terrain_texture();
+                }
                 break;
         }
 
@@ -256,14 +274,7 @@ function stopDrawing(e) {
         e.preventDefault();
         isDrawing = false;
 
-        // switch(active_type) {
-        //     case 'heightmap':
-        //         update_terrain_heightmap();
-        //         break;
-        //     case 'texturemap':
-        //         update_terrain_texture();
-        //         break;
-        // }
+        pushHistory();
     }
 }
 
@@ -271,6 +282,8 @@ function stopDrawingOnLeave(e) {
     if (isDrawing) {
         e.preventDefault(); 
         isDrawing = false;
+
+        pushHistory();
     }
 }
 
@@ -463,18 +476,84 @@ function updateFalloff() {
     }
 }
 
-// Function to undo
 function undo() {
-    if (history.length > 1) {
-        history.pop();
-        active_ctx.putImageData(history[history.length - 1], 0, 0);
+    switch(active_type) {
+        case 'heightmap':
+            if(heightmapStep > 0) {
+                heightmapStep--;
+                let canvasPic = new Image();
+                canvasPic.src = heightmapHistory[heightmapStep];
+                canvasPic.onload = function() {
+                    heightmap_ctx.drawImage(canvasPic, 0, 0);
+                }
+                
+            }
+            break;
+        case 'texturemap':
+            if(texturemapStep > 0) {
+                texturemapStep--;
+                let canvasPic = new Image();
+                canvasPic.onload = function() {
+                    texturemap_ctx.drawImage(canvasPic, 0, 0);
+                }
+                canvasPic.src = texturemapHistory[texturemapStep];
+            }
+            break;
     }
 }
 
-// Function to redo
 function redo() {
-    if (history.length < 2) return;
-    active_ctx.putImageData(history.pop(), 0, 0);
+    switch(active_type) {
+        case 'heightmap':
+            if(heightmapStep < heightmapHistory.length - 1) {
+                heightmapStep++;
+                let canvasPic = new Image();
+                canvasPic.onload = function() {
+                    heightmap_ctx.drawImage(canvasPic, 0, 0);
+                }
+                canvasPic.src = heightmapHistory[heightmapStep];
+            }
+            break;
+        case 'texturemap':
+            if(texturemapStep < texturemapHistory.length - 1) {
+                texturemapStep++;
+                let canvasPic = new Image();
+                canvasPic.onload = function() {
+                    texturemap_ctx.drawImage(canvasPic, 0, 0);
+                }
+                canvasPic.src = texturemapHistory[texturemapStep];
+            }
+            break;
+    }
+}
+
+function pushHistory() {
+    switch(active_type) {
+        case 'heightmap':
+            heightmapStep++;
+            if (heightmapStep < heightmapHistory.length) {
+                heightmapHistory.length = heightmapStep;
+            }
+            heightmapHistory.push(heightmap.toDataURL());
+            
+            if (heightmapHistory.length > maxHistoryEntries) {
+                heightmapHistory.shift();
+                heightmapStep--;
+            }
+            break;
+        case 'texturemap':
+            texturemapStep++;
+            if (texturemapStep < texturemapHistory.length) {
+                texturemapHistory.length = texturemapStep;
+            }
+            texturemapHistory.push(texturemap.toDataURL());
+
+            if (texturemapHistory.length > maxHistoryEntries) {
+                texturemapHistory.shift();
+                texturemapStep--;
+            }
+            break;
+    }
 }
 
 function toggleEraser() {
@@ -1118,4 +1197,16 @@ function pngToCanvas(canvas, ctx, buffer) {
     };
 
     image.src = imageURL;
+}
+
+function toggleAutoRefresh(checkbox) {
+    autorefresh = checkbox.checked;
+    if(autorefresh) {
+        display();
+    }
+}
+
+function display() {
+    update_terrain_heightmap();
+    update_terrain_texture();
 }

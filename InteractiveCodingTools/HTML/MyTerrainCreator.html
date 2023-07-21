@@ -263,9 +263,13 @@
                     <button onclick="toggleView('0%', '100%')" title="Terrain Preview maximieren">
                         <i class="fa-solid fa-arrow-left fa-2xl"></i>
                     </button>
-                    <button onclick="display()" title="Code visualisieren">
-                        <i class="fa-solid fa-code fa-2xl"></i>
+                    <button onclick="display()" title="Lade Preview" class="float-right">
+                        <i class="fa-solid fa-play fa-2xl"></i>
                     </button>
+                    <label class="ict-switch float-right" title="Live Preview">
+                        <input type="checkbox" onchange="toggleAutoRefresh(this)" checked>
+                        <span class="ict-slider"></span>
+                    </label>
                 </div>
             </div>
             <div class="ict-content">

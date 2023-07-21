@@ -19,8 +19,10 @@ let scene = null;
 let camera = null;
 let camera_controls = null;
 let geometry = null;
-let texture_material = null;
 let wireframe_material = null;
+
+let texture_material = null;
+
 let terrain = null;
 let light = null;
 
@@ -57,7 +59,7 @@ function init_app() {
     renderer = new THREE.WebGLRenderer({ 
         canvas: terrain_preview_canvas,
         antialias: true,
-        powerPreference: 'high-performance' 
+        powerPreference: 'high-performance'
     });
     renderer.setSize(terrain_preview_canvas.clientWidth, terrain_preview_canvas.clientHeight);
     
@@ -81,16 +83,15 @@ function init_app() {
     camera_controls.enablePan = false;
 
     // setup scene lighting
-    const color = 0xffffff;
-    const intensity = 1;
-    light = new THREE.AmbientLight(color, intensity);
-    light.position.set(-1, 2, 4);
+    light = new THREE.DirectionalLight(0xffffff, 8);
+    light.position.set(10, 10, 10);
+    light.target.position.set(0, 0, 0);
     scene.add(light);
 
     
     // initialize Terrain
-    terrain  = createMesh();
-    scene.add(terrain );
+    terrain = initMesh();
+    scene.add(terrain);
 
     // Start rendering
     render();
@@ -115,12 +116,297 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
 }
 
-function createMesh() {
+function initMesh() {
+
+    geometry = create_terrain_geometry();
+
+    const displacement_scale_val = Number(displacement_scale.value) / scale_divisor;
+
+    wireframe_material = new THREE.MeshStandardMaterial({
+        wireframe: true,
+        color: 0x00ff00,
+        displacementMap: new THREE.CanvasTexture(heightmap), // heightmap is set in 'MyTerrainCreator.js'
+        displacementScale: displacement_scale_val,
+    });
+
+
+    texture_material = createCustomShaderMaterial(heightmap, texturemap, displacement_scale_val);
+    const mesh = new THREE.Mesh(geometry, texture_material);
+
+    return mesh;
+}
+
+let distance = 1;
+
+function render() {
+    requestAnimationFrame(render);
+
+    // light.position.x = Math.sin(Date.now() * 0.001) * distance;
+    // light.position.z = Math.cos(Date.now() * 0.001) * distance;
+
+    renderer.render(scene, camera);
+}
+
+function flatten3(array) {
+    let result = [];
+    for (let i = 0; i < array.length; i++) {
+        result.push(array[i].x);
+        result.push(array[i].y);
+        result.push(array[i].z);
+    }
+    return result;
+}
+
+function flatten2(array) {
+    let result = [];
+    for (let i = 0; i < array.length; i++) {
+        result.push(array[i].x);
+        result.push(array[i].y);
+    }
+    return result;
+}
+
+export function update_terrain_heightmap() {
+
+    texture_material.uniforms.displacementMap.value = new THREE.CanvasTexture(heightmap);
+    texture_material.needsUpdate = true;
+    wireframe_material.displacementMap.needsUpdate = true;
+}
+
+export function update_terrain_material() {
+    const displacement_scale_val = Number(displacement_scale.value) / scale_divisor;
+    
+    if(wireframe.checked) {
+        terrain.material = wireframe_material;
+    }
+    else {
+        terrain.material = texture_material;
+    }
+
+    wireframe_material.displacementScale = displacement_scale_val;
+
+    texture_material.uniforms.displacementScale.value = Number(displacement_scale.value) / scale_divisor;
+    texture_material.needsUpdate = true;
+}
+
+export function update_terrain_texture() {
+    texture_material.uniforms.textureMap.value = new THREE.CanvasTexture(texturemap);
+    texture_material.needsUpdate = true;
+}
+
+export function update_textures() {
+    const displacement_scale_val = Number(displacement_scale.value) / scale_divisor;
+
+    wireframe_material = new THREE.MeshPhysicalMaterial({
+        wireframe: true,
+        color: 0x00ff00,
+        displacementMap: new THREE.CanvasTexture(heightmap), // heightmap is set in 'MyTerrainCreator.js'
+        displacementScale: displacement_scale_val,
+    });
+
+    texture_material = createCustomShaderMaterial(heightmap, texturemap, displacement_scale_val);
+
+    if(wireframe.checked) {
+        terrain.material = wireframe_material;
+    }
+    else {
+        terrain.material = texture_material;
+    }
+}
+
+export function update_terrain_geometry() {
+    
+    geometry = create_terrain_geometry();
+    
+    terrain.geometry.dispose();     // Clear the existing geometry from memory to free up resources
+    terrain.geometry = geometry;
+
+    // update uniforms to calculate vertex normals
+    const resolution_x_val = Number(resolution_x.value);
+    const resolution_y_val = Number(resolution_y.value);
+    const scale = Number(terrain_scale.value);
+    const scale_x = scale * resolution_x_val / Math.max(resolution_x_val, resolution_y_val);
+    const scale_y = scale * resolution_y_val / Math.max(resolution_x_val, resolution_y_val);
+
+    texture_material.uniforms.resolution_x.value = resolution_x_val;
+    texture_material.uniforms.resolution_y.value = resolution_y_val;
+    texture_material.uniforms.scale_x.value = scale_x;
+    texture_material.uniforms.scale_y.value = scale_y;
+    texture_material.needsUpdate = true;
+}
+
+// Custom Shader
+// basic idea taken from 'https://discourse.threejs.org/t/calculating-vertex-normals-after-displacement-in-the-vertex-shader/16989' (21.07.2023)
+// used to calculate the vertex normals after applying the displacement
+const vertexShaderCode = `
+    varying vec2 vertex_uv;
+    varying vec3 vertex_normal;
+
+    uniform sampler2D displacementMap;
+    uniform float displacementScale;
+    uniform float scale_x;
+    uniform float scale_y;
+    uniform float resolution_x;
+    uniform float resolution_y;
+
+    // we can use these, as all normals in our geometry face upwards (0.0, 1.0, 0.0)
+    vec3 x_vector = vec3(1.0, 0.0, 0.0);
+    vec3 z_vector = vec3(0.0, 0.0, 1.0);
+
+    vec3 getNeighbourVertex(vec3 v, vec3 direction) {
+        // if the x or z value of our new vector is out of bounds we return the original vector
+        // if (   v.x + direction.x > scale_x 
+        //     || v.z + direction.z > scale_y
+        //     || v.x + direction.x < -scale_x 
+        //     || v.z + direction.z < -scale_y) 
+        // {
+        //     return v;
+        // }
+        return v + direction;
+    }
+
+    vec2 getNeighbourUv(vec2 uv, vec2 direction) {
+        // if the x or y value of our new vector is out of bounds we return the original vector
+        if (   uv.x + direction.x > 1.0 
+            || uv.y + direction.y > 1.0
+            || uv.x + direction.x < 0.0 
+            || uv.y + direction.y < 0.0) 
+        {
+            return uv;
+        }
+        return uv + direction;
+    }
+
+    vec3 getFaceNormal(vec3 v1, vec3 v2, vec3 v3) {
+        
+        vec3 edge_1 = v2 - v1;
+        vec3 edge_2 = v3 - v1;
+        
+        vec3 face_normal = normalize(cross(edge_1, edge_2));
+
+        return face_normal;
+    }
+
+    vec3 getVertexNormal(vec3 face_normal1, vec3 face_normal2, vec3 face_normal3, vec3 face_normal4) {
+        
+        vec3 vertex_normal = normalize(face_normal1 + face_normal2 + face_normal3 + face_normal4);
+        
+        return vertex_normal;
+    }
+    
+    void main() {
+        
+        // displace the current vertex
+        vec3 displaced_position = position + normal * texture2D(displacementMap, uv).r * displacementScale;
+
+        // now we recalculate the normal for our displaced vertex
+
+        // get the neighbouring vertex positions
+        vec2 position_offset = vec2(scale_x/resolution_x, scale_y/resolution_y);
+
+        vec3 north_neighbour = getNeighbourVertex(position, z_vector * position_offset.y);
+        vec3 east_neighbour = getNeighbourVertex(position, x_vector * position_offset.x);
+        vec3 south_neighbour = getNeighbourVertex(position, -z_vector * position_offset.y);
+        vec3 west_neighbour = getNeighbourVertex(position, -x_vector * position_offset.x);
+        
+        
+        // get the uv coordinates for our neighbours
+        vec2 uv_offset = vec2(1.0/resolution_x, 1.0/resolution_y);
+
+        vec2 north_neighbour_uv = getNeighbourUv(uv, vec2(0.0, uv_offset.y));
+        vec2 east_neighbour_uv = getNeighbourUv(uv, vec2(uv_offset.x, 0.0));
+        vec2 south_neighbour_uv = getNeighbourUv(uv, vec2(0.0, -uv_offset.y));
+        vec2 west_neighbour_uv = getNeighbourUv(uv, vec2(-uv_offset.x, 0.0));
+
+
+        // get the displaced neighbours
+        vec3 north_displaced = north_neighbour + normal * texture2D(displacementMap, north_neighbour_uv).r * displacementScale;
+        vec3 east_displaced = east_neighbour + normal * texture2D(displacementMap, east_neighbour_uv).r * displacementScale;
+        vec3 south_displaced = south_neighbour + normal * texture2D(displacementMap, south_neighbour_uv).r * displacementScale;
+        vec3 west_displaced = west_neighbour + normal * texture2D(displacementMap, west_neighbour_uv).r * displacementScale;
+
+        // now calculate the face normals of our neighbours
+        vec3 face_normal_north_east = getFaceNormal(displaced_position, east_displaced, north_displaced);
+        vec3 face_normal_south_east = getFaceNormal(displaced_position, south_displaced, east_displaced);
+        vec3 face_normal_south_west = getFaceNormal(displaced_position, west_displaced, south_displaced);
+        vec3 face_normal_north_west = getFaceNormal(displaced_position, north_displaced, west_displaced);
+
+        // finally we calculate the vertex normal
+        vertex_normal = getVertexNormal(face_normal_north_east, face_normal_south_east, face_normal_south_west, face_normal_north_west);
+        vertex_uv = uv;
+        
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(displaced_position, 1.0);
+    }
+`;
+
+const fragmentShaderCode = `
+    uniform sampler2D textureMap;
+    // uniform vec3 directionalLightColor;
+    // uniform vec3 directionalLightDirection;
+
+
+    vec3 directionalLightColor = vec3(0.1, 0.1, 0.1);
+    vec3 directionalLightDirection = vec3(-1.0, -1.0, -1.0);
+    
+    varying vec2 vertex_uv;
+    varying vec3 vertex_normal;
+
+    void main() {
+
+        vec3 normal = normalize(vertex_normal);
+
+        vec3 lightDirection = normalize(directionalLightDirection);
+        float diffuseIntensity = max(dot(normal, lightDirection), 0.0);
+
+        vec3 ambient = texture2D(textureMap, vertex_uv).rgb * 0.4;
+        vec3 diffuse = directionalLightColor * diffuseIntensity;
+
+        vec3 finalColor = ambient + diffuse;
+
+        gl_FragColor = vec4(finalColor, 1.0);
+
+        //gl_FragColor = vec4((vertex_normal * 0.5) + 0.5, 1.0);
+        //gl_FragColor = texture2D(textureMap, vertex_uv);
+    }
+`;
+
+// Function to create a custom ShaderMaterial
+function createCustomShaderMaterial(displacementCanvas, textureCanvas, displacement_scale) {
+    
+    const displacementMap = new THREE.CanvasTexture(displacementCanvas);
+    const textureMap = new THREE.CanvasTexture(textureCanvas);
+    
+    const resolution_x_val = Number(resolution_x.value);
+    const resolution_y_val = Number(resolution_y.value);
+    const scale = Number(terrain_scale.value);
+
+    const scale_x = scale * resolution_x_val / Math.max(resolution_x_val, resolution_y_val);
+    const scale_y = scale * resolution_y_val / Math.max(resolution_x_val, resolution_y_val);
+
+
+    const material = new THREE.ShaderMaterial({
+        side: THREE.DoubleSide,
+        vertexShader: vertexShaderCode,
+        fragmentShader: fragmentShaderCode,
+        uniforms: {
+            displacementMap: { type: 't', value: displacementMap },
+            textureMap: { type: 't', value: textureMap },
+            displacementScale: { type: 'f', value: displacement_scale },
+            scale_x: { type: 'f', value: scale_x },
+            scale_y: { type: 'f', value: scale_y },
+            resolution_x: { type: 'f', value: resolution_x_val },
+            resolution_y: { type: 'f', value: resolution_y_val }
+        },
+    });
+
+    return material;
+}
+
+function create_terrain_geometry() {
     // get info
     const resolution_x_val = Number(resolution_x.value);
     const resolution_y_val = Number(resolution_y.value);
     const scale = Number(terrain_scale.value);
-    const displacement_scale_val = Number(displacement_scale.value) / scale_divisor;
 
     const scale_x = scale * resolution_x_val / Math.max(resolution_x_val, resolution_y_val);
     const scale_y = scale * resolution_y_val / Math.max(resolution_x_val, resolution_y_val);
@@ -174,188 +460,20 @@ function createMesh() {
     normals = flatten3(normals);
     uvs = flatten2(uvs);
 
-    geometry = new THREE.BufferGeometry();
-    geometry.setAttribute(
+    let new_geometry = new THREE.BufferGeometry();
+    new_geometry.setAttribute(
         'position',
         new THREE.BufferAttribute(new Float32Array(vertices), positionNumComponents)
     );
-    geometry.setAttribute(
+    new_geometry.setAttribute(
         'normal',
         new THREE.BufferAttribute(new Float32Array(normals), normalNumComponents)
     );
-    geometry.setAttribute(
+    new_geometry.setAttribute(
         'uv',
         new THREE.BufferAttribute(new Float32Array(uvs), uvNumComponents)
     );
-    geometry.setIndex(triangles);
+    new_geometry.setIndex(triangles);
 
-    texture_material = new THREE.MeshPhysicalMaterial({
-        map: new THREE.CanvasTexture(texturemap), // texture is set in 'MyTerrainCreator.js'
-        displacementMap: new THREE.CanvasTexture(heightmap), // heightmap is set in 'MyTerrainCreator.js'
-        displacementScale: displacement_scale_val,
-        side: THREE.DoubleSide,
-    });
-
-    wireframe_material = new THREE.MeshPhysicalMaterial({
-        wireframe: true,
-        color: 0x00ff00,
-        displacementMap: new THREE.CanvasTexture(heightmap), // heightmap is set in 'MyTerrainCreator.js'
-        displacementScale: displacement_scale_val,
-    });
-
-    const mesh = new THREE.Mesh(geometry, texture_material);
-
-    return mesh;
-}
-
-function render() {
-    requestAnimationFrame(render);
-    renderer.render(scene, camera);
-}
-
-function flatten3(array) {
-    let result = [];
-    for (let i = 0; i < array.length; i++) {
-        result.push(array[i].x);
-        result.push(array[i].y);
-        result.push(array[i].z);
-    }
-    return result;
-}
-
-function flatten2(array) {
-    let result = [];
-    for (let i = 0; i < array.length; i++) {
-        result.push(array[i].x);
-        result.push(array[i].y);
-    }
-    return result;
-}
-
-export function update_terrain_heightmap() {
-    // Update the heightmap on the material
-    texture_material.displacementMap.needsUpdate = true;
-    wireframe_material.displacementMap.needsUpdate = true;
-}
-
-export function update_terrain_material() {
-    const displacement_scale_val = Number(displacement_scale.value) / scale_divisor;
-    
-    if(wireframe.checked) {
-        terrain.material = wireframe_material;
-    }
-    else {
-        terrain.material = texture_material;
-    }
-
-    texture_material.displacementScale = displacement_scale_val;
-    wireframe_material.displacementScale = displacement_scale_val;
-}
-
-export function update_terrain_texture() {
-    // Update the texturemap on the material
-    texture_material.map.needsUpdate = true;
-}
-
-export function update_textures() {
-    const displacement_scale_val = Number(displacement_scale.value) / scale_divisor;
-
-    texture_material = new THREE.MeshPhysicalMaterial({
-        map: new THREE.CanvasTexture(texturemap), // texture is set in 'MyTerrainCreator.js'
-        displacementMap: new THREE.CanvasTexture(heightmap), // heightmap is set in 'MyTerrainCreator.js'
-        displacementScale: displacement_scale_val,
-        side: THREE.DoubleSide,
-    });
-
-    wireframe_material = new THREE.MeshPhysicalMaterial({
-        wireframe: true,
-        color: 0x00ff00,
-        displacementMap: new THREE.CanvasTexture(heightmap), // heightmap is set in 'MyTerrainCreator.js'
-        displacementScale: displacement_scale_val,
-    });
-
-    if(wireframe.checked) {
-        terrain.material = wireframe_material;
-    }
-    else {
-        terrain.material = texture_material;
-    }
-}
-
-export function update_terrain_geometry() {
-    
-    // get info
-    const resolution_x_val = Number(resolution_x.value);
-    const resolution_y_val = Number(resolution_y.value);
-    const scale = Number(terrain_scale.value);
-
-    const scale_x = scale * resolution_x_val / Math.max(resolution_x_val, resolution_y_val);
-    const scale_y = scale * resolution_y_val / Math.max(resolution_x_val, resolution_y_val);
-
-    // update camera
-    camera.position.z = scale * default_z_pos;
-    camera.position.y = scale * default_y_pos;
-    camera.position.x = 0;
-    camera.lookAt(0, 0, 0);
-    camera_controls.maxDistance = scale * 10;
-    camera_controls.minDistance = scale * 1;
-
-    let vertices = [];
-    let normals = [];
-    let uvs = [];
-    let triangles = [];
-    let triangleIndex = 0;
-
-    for (let y = 0; y < resolution_y_val; y++) {
-        for (let x = 0; x < resolution_x_val; x++) {
-            let current_index = y * resolution_x_val + x;
-            
-            let percent = new THREE.Vector2(x / (resolution_x_val - 1), y / (resolution_y_val - 1));
-
-            let point_on_mesh = new THREE.Vector3(
-                ((percent.x - 0.5) * 2 * scale_x),
-                0,
-                -((percent.y - 0.5) * 2 * scale_y),
-            )
-
-            vertices[current_index] = point_on_mesh;
-            normals[current_index] = new THREE.Vector3(0, 1, 0);
-            uvs[current_index] = percent;
-
-            if (x != (resolution_x_val - 1) && y != (resolution_y - 1)) {
-                triangles[triangleIndex] = current_index + resolution_x_val;
-                triangles[triangleIndex + 1] = current_index + resolution_x_val + 1;
-                triangles[triangleIndex + 2] = current_index;
-
-                triangles[triangleIndex + 3] = current_index + resolution_x_val + 1;
-                triangles[triangleIndex + 4] = current_index + 1;
-                triangles[triangleIndex + 5] = current_index;
-
-                triangleIndex += 6;
-            }
-        }
-    }
-
-    // transform into 1D arrays to push into the data structure
-    vertices = flatten3(vertices);
-    normals = flatten3(normals);
-    uvs = flatten2(uvs);
-
-    geometry = new THREE.BufferGeometry();
-    geometry.setAttribute(
-        'position',
-        new THREE.BufferAttribute(new Float32Array(vertices), positionNumComponents)
-    );
-    geometry.setAttribute(
-        'normal',
-        new THREE.BufferAttribute(new Float32Array(normals), normalNumComponents)
-    );
-    geometry.setAttribute(
-        'uv',
-        new THREE.BufferAttribute(new Float32Array(uvs), uvNumComponents)
-    );
-    geometry.setIndex(triangles);
-    
-    terrain.geometry.dispose();     // Clear the existing geometry from memory to free up resources
-    terrain.geometry = geometry;
+    return new_geometry;
 }
