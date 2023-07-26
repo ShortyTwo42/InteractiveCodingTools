@@ -933,14 +933,24 @@ export function uploadFile() {
                     }
                     canvas = heightmap;
                     ctx = heightmap_ctx;
-                    document.getElementById('ict-fileWidth').value = fileInfo.width;
-                    document.getElementById('ict-fileHeight').value = fileInfo.height;
+                    switch(fileInfo.type) {
+                        case 'pgm':
+                        case 'ppm':
+                            document.getElementById('ict-fileWidth').value = fileInfo.width;
+                            document.getElementById('ict-fileHeight').value = fileInfo.height;
+                            break;
+                    }
                     break;
                 case 'texturemap':
                     canvas = texturemap;
                     ctx = texturemap_ctx;
-                    document.getElementById('ict-fileWidth_texturemap').value = fileInfo.width;
-                    document.getElementById('ict-fileHeight_texturemap').value = fileInfo.height;
+                    switch(fileInfo.type) {
+                        case 'pgm':
+                        case 'ppm':
+                            document.getElementById('ict-fileWidth_texturemap').value = fileInfo.width;
+                            document.getElementById('ict-fileHeight_texturemap').value = fileInfo.height;
+                            break;
+                    }
                     break;
             }
         

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Clock } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -12,6 +13,7 @@ const terrain_preview_canvas = document.getElementById('terrain_preview_canvas')
 const default_y_pos = 2;
 const default_z_pos = 2;
 const scale_divisor = 10;
+const clock = new Clock();
 
 
 let renderer = null;
@@ -134,17 +136,6 @@ function initMesh() {
     const mesh = new THREE.Mesh(geometry, texture_material);
 
     return mesh;
-}
-
-let distance = 1;
-
-function render() {
-    requestAnimationFrame(render);
-
-    // light.position.x = Math.sin(Date.now() * 0.001) * distance;
-    // light.position.z = Math.cos(Date.now() * 0.001) * distance;
-
-    renderer.render(scene, camera);
 }
 
 function flatten3(array) {
@@ -341,12 +332,9 @@ const vertexShaderCode = `
 
 const fragmentShaderCode = `
     uniform sampler2D textureMap;
-    // uniform vec3 directionalLightColor;
-    // uniform vec3 directionalLightDirection;
-
-
-    vec3 directionalLightColor = vec3(0.1, 0.1, 0.1);
-    vec3 directionalLightDirection = vec3(-1.0, -1.0, -1.0);
+    uniform vec3 light_color;
+    uniform vec3 light_direction;
+    uniform vec3 ambient;
     
     varying vec2 vertex_uv;
     varying vec3 vertex_normal;
@@ -355,15 +343,18 @@ const fragmentShaderCode = `
 
         vec3 normal = normalize(vertex_normal);
 
-        vec3 lightDirection = normalize(directionalLightDirection);
-        float diffuseIntensity = max(dot(normal, lightDirection), 0.0);
+        // diffuse material color
+        vec3 material_diffuse = texture2D(textureMap, vertex_uv).rgb * ambient;
+        
+        // diffuse light
+        vec3 lightDirection = normalize(light_direction);
+        float cos_phi = max(dot(normal, lightDirection), 0.0);
 
-        vec3 ambient = texture2D(textureMap, vertex_uv).rgb * 0.4;
-        vec3 diffuse = directionalLightColor * diffuseIntensity;
+        // calculate final color
+        vec3 final_color = texture2D(textureMap, vertex_uv).rgb * ambient;
+        final_color += material_diffuse * cos_phi * light_color;
 
-        vec3 finalColor = ambient + diffuse;
-
-        gl_FragColor = vec4(finalColor, 1.0);
+        gl_FragColor = vec4(final_color, 1.0);
 
         //gl_FragColor = vec4((vertex_normal * 0.5) + 0.5, 1.0);
         //gl_FragColor = texture2D(textureMap, vertex_uv);
@@ -384,6 +375,11 @@ function createCustomShaderMaterial(displacementCanvas, textureCanvas, displacem
     const scale_y = scale * resolution_y_val / Math.max(resolution_x_val, resolution_y_val);
 
 
+    const light_color = new THREE.Vector3(light.color.r, light.color.g, light.color.b);
+    const light_direction = light.position.negate();
+    const ambient = new THREE.Vector3(0.2, 0.2, 0.2);
+
+
     const material = new THREE.ShaderMaterial({
         side: THREE.DoubleSide,
         vertexShader: vertexShaderCode,
@@ -395,8 +391,11 @@ function createCustomShaderMaterial(displacementCanvas, textureCanvas, displacem
             scale_x: { type: 'f', value: scale_x },
             scale_y: { type: 'f', value: scale_y },
             resolution_x: { type: 'f', value: resolution_x_val },
-            resolution_y: { type: 'f', value: resolution_y_val }
-        },
+            resolution_y: { type: 'f', value: resolution_y_val },
+            light_color: { type: 'v3', value: light_color },
+            light_direction: { type: 'v3', value: light_direction },
+            ambient: { type: 'v3', value: ambient },
+        }
     });
 
     return material;
@@ -476,4 +475,33 @@ function create_terrain_geometry() {
     new_geometry.setIndex(triangles);
 
     return new_geometry;
+}
+
+let distance = 10;
+let speed = 0.1;
+let time = 0;
+
+function update_light(delta) {
+
+    time += delta;
+
+    light.position.x = Math.sin(time * speed) * distance;
+    light.position.z = Math.cos(time * speed) * distance;
+    light.position.y = distance;
+
+    const light_color = new THREE.Vector3(light.color.r, light.color.g, light.color.b);
+    const light_direction = light.position.negate();
+
+    texture_material.uniforms.light_color.value = light_color;
+    texture_material.uniforms.light_direction.value = light_direction;
+    texture_material.needsUpdate = true;
+}
+
+function render() {
+    requestAnimationFrame(render);
+
+    const delta = clock.getDelta();
+    update_light(delta);
+
+    renderer.render(scene, camera);
 }
