@@ -131,7 +131,7 @@ function initMesh() {
 
     wireframe_material = new THREE.MeshStandardMaterial({
         wireframe: true,
-        color: 0x00ff00,
+        emissive: 0x00ff00,
         displacementMap: new THREE.CanvasTexture(heightmap), // heightmap is set in 'MyTerrainCreator.js'
         displacementScale: displacement_scale_val,
     });
