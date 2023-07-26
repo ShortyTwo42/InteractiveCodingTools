@@ -193,7 +193,7 @@ button:disabled>.file_upload_label {
     line-height: 1.3rem;
     overflow-y: hidden;
     overflow-x: hidden;
-    white-space: nowrap;
+    white-space: pre-wrap;
     padding: 0;
     border: 0;
     background: var(--mine_shaft);
@@ -367,10 +367,16 @@ input:checked + .ict-slider:before {
     width: 2.5rem !important;
 }
 
+/* Works for Chrome, Safari, Edge, Opera */
 .ict-numbers::-webkit-outer-spin-button,
 .ict-numbers::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+/* Works for Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
 }
 
 .ict-numbers:focus {
