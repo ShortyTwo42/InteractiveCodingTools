@@ -35,6 +35,9 @@ let resolution_y = null;
 let terrain_scale = null;
 let displacement_scale = null;
 let wireframe = null;
+let light_rotation = null;
+let light_rotation_speed = null;
+let light_color_picker = null;
 
 const positionNumComponents = 3;
 const normalNumComponents = 3;
@@ -50,6 +53,9 @@ function init_app() {
     terrain_scale = document.getElementById('terrain_scale');
     displacement_scale = document.getElementById('displacement_scale');
     wireframe = document.getElementById('wireframe');
+    light_rotation = document.getElementById('light_rotation');
+    light_rotation_speed = document.getElementById('light_rotation_speed');
+    light_color_picker = document.getElementById('light_color_picker');
     
     // Set up event listeners for UI elements
     resolution_x.addEventListener('input', update_terrain_geometry);
@@ -57,6 +63,7 @@ function init_app() {
     terrain_scale.addEventListener('input', update_terrain_geometry);
     displacement_scale.addEventListener('input', update_terrain_material);
     wireframe.addEventListener('change', update_terrain_material);
+    light_color_picker.addEventListener('input', update_light_color);
     
     // setup Renderer
     renderer = new THREE.WebGLRenderer({ 
@@ -482,23 +489,30 @@ function create_terrain_geometry() {
     return new_geometry;
 }
 
-let distance = 10;
-let speed = 0.1;
 let time = 0;
 
 function update_light(delta) {
 
-    time += delta;
+    if(light_rotation.checked) {
+        const speed = Number(light_rotation_speed.value) / 100;
+        
+        time += delta;
 
-    light.position.x = Math.sin(time * speed) * distance;
-    light.position.z = Math.cos(time * speed) * distance;
-    light.position.y = distance;
+        light.position.x = Math.sin(time * speed) * 10;
+        light.position.z = Math.cos(time * speed) * 10;
+        light.position.y = 10;
 
+        const light_direction = light.position.negate();
+
+        texture_material.uniforms.light_direction.value = light_direction;
+        texture_material.needsUpdate = true;
+    }
+}
+
+function update_light_color() {
+    light.color = new THREE.Color(light_color_picker.value);
     const light_color = new THREE.Vector3(light.color.r, light.color.g, light.color.b);
-    const light_direction = light.position.negate();
-
     texture_material.uniforms.light_color.value = light_color;
-    texture_material.uniforms.light_direction.value = light_direction;
     texture_material.needsUpdate = true;
 }
 

@@ -421,6 +421,35 @@
                                         <input type="checkbox" id="wireframe"/>
                                     </div>
                                 </div>
+                                <div class="ict-box">
+                                    <h2>
+                                        Licht-Optionen
+                                    </h2>
+                                    <div class="ict-option_item">
+                                        <label for="light_rotation">
+                                            Licht-Rotation
+                                        </label>
+                                        <input type="checkbox" id="light_rotation"/>
+                                    </div>
+
+                                    <div class="ict-option_item">
+                                        <label for="displacement_scale">
+                                            Rotations Geschwindigkeit
+                                        </label>
+                                        <div class="ict-number_container">
+                                            <button onclick="decreaseNumber('light_rotation_speed')" class="decrease_button">-</button>
+                                            <input type="number" min="1" max="100" step="10" class="ict-numbers" id="light_rotation_speed" value="10"/>
+                                            <button onclick="increaseNumber('light_rotation_speed')" class="increase_button">+</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="ict-option_item">
+                                        <label for="light_color_picker">
+                                            Farbe
+                                        </label>
+                                        <input type="color" id="light_color_picker" value="#ffffff"/>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="canvas_container" oncontextmenu="return false;">
