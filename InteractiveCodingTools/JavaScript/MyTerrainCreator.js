@@ -426,7 +426,7 @@ function updateColor() {
             heightColorPreview.value = grayscale;
 
             if (!active) {
-                active_ctx.strokeStyle = grayscale;
+                heightmap_ctx.strokeStyle = grayscale;
                 updateFalloff();
             }
             break;
@@ -434,7 +434,7 @@ function updateColor() {
             const col = textureColorInput.value;
 
             if (!active) {
-                active_ctx.strokeStyle = col;
+                texturemap_ctx.strokeStyle = col;
                 updateFalloff();
             }
             break;
@@ -449,27 +449,35 @@ function updateOpacity() {
 
     let active = eraserButton.classList.contains('active_elem');
     if (!active) {
-        active_ctx.globalAlpha = y;
+        heightmap_ctx.globalAlpha = y;
+        texturemap_ctx.globalAlpha = y;
     }
 }
 
 function updateBrushSize() {
     const brushSize = isNaN(parseFloat(brushSizeInput.value)) ? 0 : parseFloat(brushSizeInput.value);
-    active_ctx.lineWidth = brushSize;
+    heightmap_ctx.lineWidth = brushSize;
+    texturemap_ctx.lineWidth = brushSize;
 }
 
 // Function to update the color falloff
 function updateFalloff() {
     if (falloffCheckbox.checked) {
-        let active = eraserButton.classList.contains('active_elem');
+        const active = eraserButton.classList.contains('active_elem');
         if (!active) {
-            active_ctx.shadowColor = heightColorPreview.value;
-            active_ctx.shadowBlur = brushSizeInput.value / 2;
-            active_ctx.lineWidth = 0;
+            heightmap_ctx.shadowColor = heightColorPreview.value;
+            heightmap_ctx.shadowBlur = brushSizeInput.value / 2;
+            heightmap_ctx.lineWidth = 0;
+
+            texturemap_ctx.shadowColor = textureColorInput.value;
+            texturemap_ctx.shadowBlur = brushSizeInput.value / 2;
+            texturemap_ctx.lineWidth = 0;
         }
     } else {
-        active_ctx.shadowColor = 'rgba(0, 0, 0, 0)';
-        active_ctx.shadowBlur = 0;
+        heightmap_ctx.shadowColor = 'rgba(0, 0, 0, 0)';
+        heightmap_ctx.shadowBlur = 0;
+        texturemap_ctx.shadowColor = 'rgba(0, 0, 0, 0)';
+        texturemap_ctx.shadowBlur = 0;
         updateBrushSize();
     }
 }
