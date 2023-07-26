@@ -224,8 +224,6 @@ function startDrawing(e) {
         active_ctx.lineTo(mousePos.x, mousePos.y);
         active_ctx.stroke();
     }
-    
-    // history.push(ctx.getImageData(0, 0, heightmap.width, heightmap.height));
 }
 
 function draw(e) {
@@ -729,7 +727,6 @@ function createNewCanvas() {
     updateColor();
     updateOpacity();
     updateBrushSize();
-    updateFalloff();
     heightmap_ctx.lineCap = 'round';
     heightmap_ctx.lineJoin = 'round';
     texturemap_ctx.lineCap = 'round';
@@ -968,8 +965,6 @@ export function uploadFile() {
                     pngToCanvas(canvas, ctx, buffer);
                     break;
             }
-
-            update_textures();
         }
         
         reader.readAsArrayBuffer(file);
@@ -1124,6 +1119,17 @@ function pgmToCanvas(canvas, picInfo) {
             context.fillRect(x, y, 1, 1);
         }
     }
+
+    update_textures();
+
+    //////////////////// reset brush parameters to current values ///////////////////
+    updateColor();
+    updateOpacity();
+    updateBrushSize();
+    heightmap_ctx.lineCap = 'round';
+    heightmap_ctx.lineJoin = 'round';
+    texturemap_ctx.lineCap = 'round';
+    texturemap_ctx.lineJoin = 'round';
 }
 
 function ppmToCanvas(canvas, picInfo) {
@@ -1137,6 +1143,17 @@ function ppmToCanvas(canvas, picInfo) {
             context.fillRect(x, y, 1, 1);
         }
     } 
+
+    update_textures();
+
+    //////////////////// reset brush parameters to current values ///////////////////
+    updateColor();
+    updateOpacity();
+    updateBrushSize();
+    heightmap_ctx.lineCap = 'round';
+    heightmap_ctx.lineJoin = 'round';
+    texturemap_ctx.lineCap = 'round';
+    texturemap_ctx.lineJoin = 'round';
 }
 
 function jpgToCanvas(canvas, ctx, buffer) {
@@ -1154,6 +1171,7 @@ function jpgToCanvas(canvas, ctx, buffer) {
                 const imageBitmap = await createImageBitmap(image);
                 ctx.filter = 'grayscale(100%)';
                 ctx.drawImage(imageBitmap, 0, 0);
+                ctx.filter = 'none';
                 document.getElementById('ict-fileWidth').value = image.width;
                 document.getElementById('ict-fileHeight').value = image.height; 
                 break;
@@ -1163,6 +1181,17 @@ function jpgToCanvas(canvas, ctx, buffer) {
                 document.getElementById('ict-fileHeight_texturemap').value = image.height;    
                 break;
         }
+
+        update_textures();
+
+        //////////////////// reset brush parameters to current values ///////////////////
+        updateColor();
+        updateOpacity();
+        updateBrushSize();
+        heightmap_ctx.lineCap = 'round';
+        heightmap_ctx.lineJoin = 'round';
+        texturemap_ctx.lineCap = 'round';
+        texturemap_ctx.lineJoin = 'round';
 
         URL.revokeObjectURL(imageURL);
     }
@@ -1198,6 +1227,17 @@ function pngToCanvas(canvas, ctx, buffer) {
                 document.getElementById('ict-fileHeight_texturemap').value = image.height;    
                 break;
         }
+
+        update_textures();
+
+        //////////////////// reset brush parameters to current values ///////////////////
+        updateColor();
+        updateOpacity();
+        updateBrushSize();
+        heightmap_ctx.lineCap = 'round';
+        heightmap_ctx.lineJoin = 'round';
+        texturemap_ctx.lineCap = 'round';
+        texturemap_ctx.lineJoin = 'round';
 
         URL.revokeObjectURL(imageURL);
     }
