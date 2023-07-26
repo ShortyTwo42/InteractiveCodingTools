@@ -128,6 +128,13 @@ function toggleView(codingSpace_width, previewSpace_width) {
             previewSpace.style.padding = '0.5rem';
             break
     }
+
+    try {
+        handleToggleView();
+    }
+    catch {
+
+    }
 }
 
 function tryFileUpload() {

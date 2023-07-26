@@ -5,6 +5,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 document.addEventListener('DOMContentLoaded', function(){
     init_app();
     update_terrain_texture();
+    window.handleToggleView = handleToggleView;
 });
 
 const terrain_container = document.getElementById('terrain_container');
@@ -108,6 +109,10 @@ function onCleanup() {
     });
 
     renderer.dispose();
+}
+
+function handleToggleView() {
+    onWindowResize();
 }
 
 function onWindowResize() {
