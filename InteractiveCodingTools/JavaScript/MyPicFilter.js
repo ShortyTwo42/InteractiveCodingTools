@@ -277,12 +277,12 @@ function pngToCanvas(canvas, ctx, buffer) {
 
 function setFileInfoFromCanvas(canvas, ctx, type) {
     // check if the image is a grayscale image
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.width).data;
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 
     currentPicture = {};
 
     currentPicture.width = canvas.width;
-    currentPicture.height = canvas.width;
+    currentPicture.height = canvas.height;
     currentPicture.maxValue = 255;
 
     let isGrayscale = true;
@@ -1064,4 +1064,68 @@ function save_png(image_source) {
     document.body.removeChild(link);
 
     window.URL.revokeObjectURL(url);
+}
+
+// ToDo: add example images here
+async function uploadExample() {
+        
+    const example_type = document.getElementById('example_type').value;
+    const value = getSelectedRadioValue('example');
+    
+    let fileUrl = null;
+    let fileName = '';
+
+    switch (value) {
+        case 'mona_lisa':
+            fileUrl = '../Sample_Images/MyPicFilter/mona_lisa_' + example_type + '.jpg';
+            fileName = value;
+            break;
+        case 'cute_cat':
+            fileUrl = '../Sample_Images/MyPicFilter/beautiful_cat_' + example_type + '.jpg';
+            fileName = value;
+            break;
+        case 'drop_of_water':
+            fileUrl = '../Sample_Images/MyPicFilter/drop_of_water_' + example_type + '.jpg';
+            fileName = value;
+            break;
+    }
+
+    try {
+        const response = await fetch(fileUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const arrayBuffer = await response.arrayBuffer();
+
+        if(arrayBuffer) {
+            const buffer = arrayBuffer;
+            const uint8Array = new Uint8Array(buffer);
+            const fileInfo = prepareFile(uint8Array);
+    
+            // set pixel values of canvas element
+            const canvas = document.getElementById('original_img');
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+            switch(fileInfo.type) {
+                case 'pgm':
+                    currentPicture = fileInfo;
+                    pgmToCanvas(canvas, currentPicture);
+                    break;
+                case 'ppm':
+                    currentPicture = fileInfo;
+                    ppmToCanvas(canvas, currentPicture);
+                    break;
+                case 'jpg':
+                    jpgToCanvas(canvas, ctx, buffer);
+                    break;
+                case 'png':
+                    pngToCanvas(canvas, ctx, buffer);
+                    break;
+            }
+            
+            document.getElementById('ict-fileName').value = fileName;
+        }
+    } catch (error) {
+        alert('Beim hochladen des Beispiels kam es zu einem Problem');
+    }
 }

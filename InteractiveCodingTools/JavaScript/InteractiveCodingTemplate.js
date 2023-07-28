@@ -168,3 +168,15 @@ function closeModal(modal_id) {
 
     modal.style.display = 'none';
 }
+
+function getSelectedRadioValue(name) {
+    const radio_buttons = document.getElementsByName(name);
+
+    for(let i = 0; i < radio_buttons.length; i++) {
+        if(radio_buttons[i].checked) {
+            return radio_buttons[i].value;
+        }
+    }
+
+    return null;
+}

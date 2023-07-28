@@ -6,10 +6,18 @@ function uploadFile() {
 
         // define what should be done with the raw text once it is read
         reader.onload = function(e) {
-            let content = e.target.result;
+            const buffer = e.target.result;
+            const uint8Array = new Uint8Array(buffer);
+            const fileContent = prepareFile(uint8Array);
+
+            if (fileContent == -1) {
+                // wrong format or couldn't process data
+                alert('Das Format wurde nicht erkannt oder es gab Probleme beim Auslesen der Daten, bitte versuchen Sie es mit einer anderen Datei vom Typen "pgm" oder "ppm"')
+                return;
+            }
 
             let textarea = document.querySelector('.ict-code');
-            textarea.innerHTML = content;
+            textarea.innerHTML = fileContent;
 
             // trigger 'keyup' event to have code enumeration
             let event = new KeyboardEvent('keyup', {});
@@ -18,12 +26,40 @@ function uploadFile() {
             display();
         }
 
-        reader.readAsText(file);
+        reader.readAsArrayBuffer(file);
         // cuts off file extension
         let fileName = file.name.split('.').slice(0, -1).join('.');
         document.getElementById('ict-fileName').value = fileName;
-
     }
+}
+
+// function to skip all leading white spaces in the file
+function skipWhiteSpace(uint8Array) {
+    let index = 0;
+    while (index < uint8Array.length && (uint8Array[index] === 0x20 || uint8Array[index] === 0x09 || uint8Array[index] === 0x0A || uint8Array[index] === 0x0D)) {
+        index++;
+    }
+    return index;
+}
+
+function prepareFile(uint8Array) {
+    
+    const startIndex = skipWhiteSpace(uint8Array);
+
+    // Check the first few bytes of the file after skipping white spaces
+    const isPPM = uint8Array[startIndex] === 0x50 && uint8Array[startIndex + 1] === 0x33; // PPM starts with "P3" or "P6"
+    const isPGM = uint8Array[startIndex] === 0x50 && uint8Array[startIndex + 1] === 0x32; // PGM starts with "P2" or "P5"
+
+    let fileContent = -1;
+    if (isPPM) {
+        fileContent = new TextDecoder().decode(uint8Array);
+        fileContent = fileContent.trim();
+    } else if (isPGM) {
+        fileContent = new TextDecoder().decode(uint8Array);
+        fileContent = fileContent.trim();
+    }  
+
+    return fileContent;
 }
    
 function downloadFile() {
@@ -42,9 +78,9 @@ function downloadFile() {
         rawFile = transformToSvg(rawFile, 'image/svg+xml');
     }
 
-    let blob = new Blob([rawFile], {type: content.fileInfo.type});
+    const blob = new Blob([rawFile], {type: content.fileInfo.type});
 
-    let url = window.URL.createObjectURL(blob);
+    const url = window.URL.createObjectURL(blob);
 
     let fileName = document.getElementById('ict-fileName').value.trim().replace(/[\\\/:*?"<>|]/g, '');
     fileName = (fileName == '') ? 'Bild.' : fileName + '.';
@@ -65,9 +101,9 @@ function getContent() {
     let content = {};
 
     // get the input of our editor
-    let rawFile = document.querySelector('.ict-code').value.trim();
+    const rawFile = document.querySelector('.ict-code').value.trim();
 
-    let fileInfo = getFileInfo(rawFile);
+    const fileInfo = getFileInfo(rawFile);
 
     if(fileInfo == -1) {
         return fileInfo;
@@ -246,16 +282,20 @@ function getFileInfo(rawFile) {
 
 function display() {
     
-    let content = getContent();
+    const content = getContent();
 
     if(content == -1) {
         console.log('Format wurde nicht erkannt');
         return;
     }
 
-    let svgFile = transformToSvg(content.rawFile, content.fileInfo.type);
-
-    //console.log(svgFile);
+    let svgFile = '';
+    try {
+        svgFile = transformToSvg(content.rawFile, content.fileInfo.type);
+    }
+    catch {
+        
+    }
 
     let display = document.querySelector('.ict-display');
     display.innerHTML = svgFile;   
@@ -282,4 +322,54 @@ function preprocessFile(rawFile) {
     processedFile = processedFile.replace(/^\s*\n/gm, '');
     
     return processedFile;
+}
+
+// ToDo: add example images here
+async function uploadExample() {
+       
+    const example_type = document.getElementById('example_type').value;
+    const value = getSelectedRadioValue('example');
+    
+    let fileUrl = null;
+    let fileName = '';
+
+    switch (value) {
+        case 'smiley':
+            fileUrl = '../Sample_Images/MyPicCoder/smiley.' + example_type;
+            fileName = value;
+            break;
+        case 'house':
+            fileUrl = '../Sample_Images/MyPicCoder/house.' + example_type;
+            fileName = value;
+            break;
+        case 'videogame_character':
+            fileUrl = '../Sample_Images/MyPicCoder/videogame_character.' + example_type;
+            fileName = value;
+            break;
+    }
+
+
+    try {
+        const response = await fetch(fileUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const fileContent = await response.text();
+        
+        if(fileContent) {
+            
+            const textarea = document.querySelector('.ict-code');
+            textarea.innerHTML = fileContent;
+
+            display();
+            
+            document.getElementById('ict-fileName').value = fileName;
+
+            // trigger 'keyup' event to have code enumeration
+            let event = new KeyboardEvent('keyup', {});
+            textarea.dispatchEvent(event);
+        }
+    } catch (error) {
+        alert('Beim hochladen des Beispiels kam es zu einem Problem');
+    }
 }

@@ -64,6 +64,58 @@
             </div>
         </div>
     </div> 
+
+    <div class="ict-modal" id="example_modal">
+        <div class="ict-modal-content">
+            <div class="ict-modal-header">
+                <span class="ict-close" onclick="closeModal('example_modal')">
+                    &times;
+                </span>
+                <h2>
+                    Beispiel Bilder
+                </h2>
+            </div>
+            <div class="ict-modal-body">   
+                <p>   
+                    <label for="example_type">
+                        Bildart:
+                    </label>
+                    <select id="example_type">
+                        <option value="grayscale">
+                            Graustufenbild
+                        </option>
+                        <option value="color">
+                            Farbbild
+                        </option>
+                    </select> 
+                </p>  
+                <div class="ict-option_item">
+                    <label for="example_1">
+                        Mona Lisa
+                    </label>
+                    <input type="radio" id="example_1" name="example" value="mona_lisa" checked/>
+                </div>
+                <div class="ict-option_item">
+                    <label for="example_2">
+                        Katze
+                    </label>
+                    <input type="radio" id="example_2" name="example" value="cute_cat"/>
+                </div>
+                <div class="ict-option_item">
+                    <label for="example_3">
+                        Wassertropfen
+                    </label>
+                    <input type="radio" id="example_3" name="example" value="drop_of_water"/>
+                </div>
+            </div>
+            <div class="ict-modal-footer">
+                <div class="spacer" style="clear: both;"></div>
+                <button onclick="uploadExample()" class="ict-modal-save" title="gewähltes Beispiel hochladen">
+                    <i class="fa-solid fa-file-arrow-up fa-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </div> 
     <!-- END MODALS -->
 
     <body>  
@@ -101,6 +153,9 @@
                             <i class="fa-solid fa-folder-open fa-2xl"></i>
                         </label>
                         <input type="file" id="file-upload" accept="image/x-portable-graymap, image/x-portable-pixmap" class="file_uploader" onchange="tryFileUpload()"/>  
+                    </button>
+                    <button onclick="openModal('example_modal')" title="Beispielbild auswählen">
+                        <i class="fa-solid fa-file-arrow-up fa-2xl"></i>
                     </button>
                     <button onclick="toggleView('100%', '0%')" title="Original maximieren" id="max_original_button">
                         <i class="fa-solid fa-arrow-right fa-2xl"></i>

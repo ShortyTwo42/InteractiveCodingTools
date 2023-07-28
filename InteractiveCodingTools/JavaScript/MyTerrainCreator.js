@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.toggleAutoRefresh = toggleAutoRefresh;
     window.display = display;
     window.createNewCanvas = createNewCanvas;
+    window.uploadExample = uploadExample;
     initDrawingApp();
 });
 
@@ -75,6 +76,8 @@ let undoButton = null;
 let redoButton = null;
 let eraserButton = null;
 let texturemapButton = null;
+let heightmapExamples = null;
+let texturemapExamples = null;
 
 
 function initDrawingApp() {
@@ -172,6 +175,8 @@ function initDrawingApp() {
     redoButton = document.getElementById('redoButton');
     eraserButton = document.getElementById('eraserButton');
     texturemapButton = document.getElementById('texturemapButton');
+    heightmapExamples = document.getElementById('heightmapExamples');
+    texturemapExamples = document.getElementById('texturemapExamples');
 
     // Set up event listeners for UI elements
     menuButton.addEventListener('click', toggleSidebar);
@@ -604,6 +609,9 @@ function toggleTexturemap() {
         heightmap.style.display = '';
         texturemap.style.display = 'none';
 
+        heightmapExamples.style.display = '';
+        texturemapExamples.style.display = 'none';
+
         active_canvas = heightmap;
         active_ctx = heightmap_ctx;
         active_type = 'heightmap';
@@ -624,6 +632,9 @@ function toggleTexturemap() {
 
         heightmap.style.display = 'none';
         texturemap.style.display = '';
+
+        heightmapExamples.style.display = 'none';
+        texturemapExamples.style.display = '';
 
         active_canvas = texturemap;
         active_ctx = texturemap_ctx;
@@ -923,7 +934,7 @@ export function uploadFile() {
 
             if (fileInfo.image == -1) {
                 // wrong format or couldn't process data
-                alert('Das Format wurde nicht erkannt oder es gab Probleme beim Auslesen der Daten, bitte versuchen Sie es mit einer anderen Datei vom Typen "pgm" oder "ppm"')
+                alert('Das Format wurde nicht erkannt oder es gab Probleme beim Auslesen der Daten, bitte versuchen Sie es mit einer anderen Datei vom Typen "pgm", "ppm", "jpg" oder "png"')
                 return;
             }
 
@@ -933,7 +944,7 @@ export function uploadFile() {
             switch (active_type) {
                 case 'heightmap':
                     if (fileInfo.type == 'ppm') {
-                        alert('Für Heightmaps muss das Format "pgm" verwendet werden');
+                        alert('Für Heightmaps muss das Format "pgm" verwendet werden oder Grauwertbilder im "jpg" oder "png" Format');
                         return;
                     }
                     canvas = heightmap;
@@ -1267,4 +1278,107 @@ function toggleAutoRefresh(checkbox) {
 function display() {
     update_terrain_heightmap();
     update_terrain_texture();
+}
+
+async function uploadExample() {
+        
+    const value = getSelectedRadioValue(active_type + '_example');
+    
+    let fileUrl = null;
+    let fileName = '';
+
+    switch (value) {
+        case 'great_lakes_heightmap':
+            fileUrl = '../Sample_Images/MyTerrainCreator/Heightmaps/great_lakes_heightmap.png';
+            fileName = value;
+            break;
+        case 'mountain_range_heightmap':
+            fileUrl = '../Sample_Images/MyTerrainCreator/Heightmaps/mountain_range_heightmap.png';
+            fileName = value;
+            break;
+        case 'rolling_hills_heightmap':
+            fileUrl = '../Sample_Images/MyTerrainCreator/Heightmaps/rolling_hills_heightmap.png';
+            fileName = value;
+            break;
+        case 'great_lakes_texturemap':
+            fileUrl = '../Sample_Images/MyTerrainCreator/Texturemaps/great_lakes_texturemap.png';
+            fileName = value;
+            break;
+        case 'mountain_range_texturemap':
+            fileUrl = '../Sample_Images/MyTerrainCreator/Texturemaps/mountain_range_texturemap.png';
+            fileName = value;
+            break;
+        case 'rolling_hills_texturemap':
+            fileUrl = '../Sample_Images/MyTerrainCreator/Texturemaps/rolling_hills_texturemap.png';
+            fileName = value;
+            break;
+    }
+
+    try {
+        const response = await fetch(fileUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const arrayBuffer = await response.arrayBuffer();
+
+        if(arrayBuffer) {
+            const buffer = arrayBuffer;
+            const uint8Array = new Uint8Array(buffer);
+            const fileInfo = prepareFile(uint8Array);
+    
+            // get relevant canvas
+            let canvas = null;
+            let ctx = null;
+            switch (active_type) {
+                case 'heightmap':
+                    canvas = heightmap;
+                    ctx = heightmap_ctx;
+                    switch(fileInfo.type) {
+                        case 'pgm':
+                        case 'ppm':
+                            document.getElementById('ict-fileWidth').value = fileInfo.width;
+                            document.getElementById('ict-fileHeight').value = fileInfo.height;
+                            break;
+                    }
+                    break;
+                case 'texturemap':
+                    canvas = texturemap;
+                    ctx = texturemap_ctx;
+                    switch(fileInfo.type) {
+                        case 'pgm':
+                        case 'ppm':
+                            document.getElementById('ict-fileWidth_texturemap').value = fileInfo.width;
+                            document.getElementById('ict-fileHeight_texturemap').value = fileInfo.height;
+                            break;
+                    }
+                    break;
+            }
+        
+            switch(fileInfo.type) {
+                case 'pgm':
+                    pgmToCanvas(canvas, fileInfo);
+                    break;
+                case 'ppm':
+                    ppmToCanvas(canvas, fileInfo);
+                    break;
+                case 'jpg':
+                    jpgToCanvas(canvas, ctx, buffer);
+                    break;
+                case 'png':
+                    pngToCanvas(canvas, ctx, buffer);
+                    break;
+            }
+    
+            switch(active_type) {
+                case 'heightmap':
+                    document.getElementById('ict-fileName').value = fileName;
+                    break;
+                case 'texturemap':
+                    document.getElementById('ict-fileName_texturemap').value = fileName;
+                    break;
+            }
+        }
+    } catch (error) {
+        alert('Beim hochladen des Beispiels kam es zu einem Problem');
+    }
 }

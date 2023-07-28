@@ -16,7 +16,6 @@ const default_z_pos = 2;
 const scale_divisor = 10;
 const clock = new Clock();
 
-
 let renderer = null;
 let scene = null;
 let camera = null;
@@ -28,6 +27,7 @@ let texture_material = null;
 
 let terrain = null;
 let light = null;
+let time = 0; // used to change the light position, if that option is checked
 
 // UI
 let resolution_x = null;
@@ -388,7 +388,7 @@ function createCustomShaderMaterial(displacementCanvas, textureCanvas, displacem
 
 
     const light_color = new THREE.Vector3(light.color.r, light.color.g, light.color.b);
-    const light_direction = light.position.negate();
+    const light_direction = light.position.clone().negate();
     const ambient = new THREE.Vector3(0.2, 0.2, 0.2);
 
 
@@ -489,8 +489,6 @@ function create_terrain_geometry() {
     return new_geometry;
 }
 
-let time = 0;
-
 function update_light(delta) {
 
     if(light_rotation.checked) {
@@ -502,7 +500,7 @@ function update_light(delta) {
         light.position.z = Math.cos(time * speed) * 10;
         light.position.y = 10;
 
-        const light_direction = light.position.negate();
+        const light_direction = light.position.clone().negate();
 
         texture_material.uniforms.light_direction.value = light_direction;
         texture_material.needsUpdate = true;

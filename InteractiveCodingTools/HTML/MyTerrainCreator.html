@@ -35,52 +35,108 @@
                     Speichern
                 </h2>
             </div>
-            <div class="ict-modal-body">
-                <p>   
-                    <label for="save_as">
-                        Heightmap/Texturemap speichern als:
+            <div class="ict-modal-body">   
+                <label for="save_as">
+                    Heightmap/Texturemap speichern als:
+                </label>
+                <select id="save_as">
+                    <option value="pgm_ppm">
+                        PGM/PPM
+                    </option>
+                    <option value="jpg">
+                        JPG
+                    </option>
+                    <option value="png">
+                        PNG
+                    </option>
+                </select> 
+            
+                <div class="ict-option_item">
+                    <label for="save_heightmap">
+                        Heightmap speichern
                     </label>
-                    <select id="save_as">
-                        <option value="pgm_ppm">
-                            PGM/PPM
-                        </option>
-                        <option value="jpg">
-                            JPG
-                        </option>
-                        <option value="png">
-                            PNG
-                        </option>
-                    </select> 
-                </p>   
-                <p>
-                    <div class="ict-option_item">
-                        <label for="save_heightmap">
-                            Heightmap speichern
-                        </label>
-                        <input type="checkbox" id="save_heightmap" checked/>
-                    </div>
-                </p>
-                <p>
-                    <div class="ict-option_item">
-                        <label for="save_texturemap">
-                            Texturemap speichern
-                        </label>
-                        <input type="checkbox" id="save_texturemap" checked/>
-                    </div>
-                </p>
-                <p>
-                    <div class="ict-option_item">
-                        <label for="save_terrain">
-                            Terrain speichern
-                        </label>
-                        <input type="checkbox" id="save_terrain" checked/>
-                    </div>
-                </p>
+                    <input type="checkbox" id="save_heightmap" checked/>
+                </div>
+            
+                <div class="ict-option_item">
+                    <label for="save_texturemap">
+                        Texturemap speichern
+                    </label>
+                    <input type="checkbox" id="save_texturemap" checked/>
+                </div>
+            
+                <div class="ict-option_item">
+                    <label for="save_terrain">
+                        Terrain speichern
+                    </label>
+                    <input type="checkbox" id="save_terrain" checked/>
+                </div>
             </div>
             <div class="ict-modal-footer">
                 <div class="spacer" style="clear: both;"></div>
                 <button onclick="tryFileDownload(); closeModal('save_modal');" class="ict-modal-save" title="speicher gewählte Daten">
                     <i class="fa-solid fa-floppy-disk fa-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </div> 
+
+    <div class="ict-modal" id="example_modal">
+        <div class="ict-modal-content">
+            <div class="ict-modal-header">
+                <span class="ict-close" onclick="closeModal('example_modal')">
+                    &times;
+                </span>
+                <h2>
+                    Beispiel Bilder
+                </h2>
+            </div>
+            <div class="ict-modal-body">
+                <div id="heightmapExamples">
+                    <div class="ict-option_item">
+                        <label for="heightmap_1">
+                            Great Lakes Heightmap
+                        </label>
+                        <input type="radio" id="heightmap_1" name="heightmap_example" value="great_lakes_heightmap" checked/>
+                    </div>
+                    <div class="ict-option_item">
+                        <label for="heightmap_2">
+                            Mountain Range Heightmap
+                        </label>
+                        <input type="radio" id="heightmap_2" name="heightmap_example" value="mountain_range_heightmap"/>
+                    </div>
+                    <div class="ict-option_item">
+                        <label for="heightmap_3">
+                            Rolling Hills Heightmap
+                        </label>
+                        <input type="radio" id="heightmap_3" name="heightmap_example" value="rolling_hills_heightmap"/>
+                    </div>
+                </div>
+                <div id="texturemapExamples" style="display: none">
+                    <div class="ict-option_item">
+                        <label for="texturemap_1">
+                            Great Lakes Texturemap
+                        </label>
+                        <input type="radio" id="texturemap_1" name="texturemap_example" value="great_lakes_texturemap" checked/>
+                    </div>
+                    <div class="ict-option_item">
+                        <label for="texturemap_2">
+                            Mountain Range Texturemap
+                        </label>
+                        <input type="radio" id="texturemap_2" name="texturemap_example" value="mountain_range_texturemap"/>
+                    </div>
+                    <div class="ict-option_item">
+                        <label for="texturemap_3">
+                            Rolling Hills Texturemap
+                        </label>
+                        <input type="radio" id="texturemap_3" name="texturemap_example" value="rolling_hills_texturemap"/>
+                    </div>
+                </div>
+            </div>
+            <div class="ict-modal-footer">
+                <div class="spacer" style="clear: both;"></div>
+                <button onclick="uploadExample()" class="ict-modal-save" title="gewähltes Beispiel hochladen">
+                    <i class="fa-solid fa-file-arrow-up fa-2xl"></i>
                 </button>
             </div>
         </div>
@@ -256,6 +312,9 @@
                             <i class="fa-solid fa-folder-open fa-2xl"></i>
                         </label>
                         <input type="file" data-type="heightmap" id="file-upload" class="file_uploader" onchange="tryFileUpload()"/>  
+                    </button>
+                    <button onclick="openModal('example_modal')" title="Beispiel Heightmap/Texturemap auswählen">
+                        <i class="fa-solid fa-file-arrow-up fa-2xl"></i>
                     </button>
                     <button onclick="openModal('new_canvas_modal')" id="create_new_canvas" title="neue Heightmap/Texturemap erstellen">
                         <i class="fa-solid fa-file-circle-plus fa-2xl"></i>

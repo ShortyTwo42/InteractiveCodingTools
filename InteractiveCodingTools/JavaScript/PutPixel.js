@@ -1,3 +1,4 @@
+const maximumExecutionTime = 3000;
 let picture_width;
 let picture_height;
 let myPic;
@@ -44,24 +45,50 @@ function tryExecuteCode() {
 
 function executeCode() {
 
-    let numRows = picture_height; // Number of rows
-    let numCols = picture_width; // Number of columns
+    const numRows = picture_height; // Number of rows
+    const numCols = picture_width; // Number of columns
     
     // reset myPic as 2d array
     myPic = Array.from({ length: numRows }, () => Array(numCols).fill([255, 255, 255]));
 
-    //console.log(myPic);
+    const code = document.querySelector('.ict-code').value;
 
-    let code = document.querySelector('.ict-code').value;
+    const safe_code = check_code_saefty(code);
 
-    let userFunction = Function(code);
+    const userFunction = Function(safe_code);
     userFunction();
-    //eval(code);
 
-    let svgFile = createSVG();
+    const svgFile = createSVG();
 
     let display = document.querySelector('.ict-display');
     display.innerHTML = svgFile; 
+}
+
+// whitelisted functions, variables
+const allowed_functions = ['putPixel', 'for', 'if'];
+const functionCallRegex = /\b\w+\s*\(\s*\)/g;
+
+// only allow certain functions and API calls
+function check_code_saefty(code) {
+
+    const non_whitelisted_functions = code.match(functionCallRegex) || []
+        .map(match => match.trim().replace('(', ''))
+        .filter(func => !allowed_functions.includes(func));
+
+    if (non_whitelisted_functions.length > 0) {
+        alert('Bitte verwende nur "for-Schleifen", "if-Abfragen" oder die Funktion "putPixel"');
+        return '';
+    }
+
+    //add timeout to function to terminate it, if it takes too long
+    let safe_code = code;
+    
+    return safe_code;
+}
+
+function executeWithTimeout(func, timeout) {
+    
+    
 }
 
 function updateOutput() {

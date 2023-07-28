@@ -6,6 +6,64 @@
         <script src="../JavaScript/InteractiveCodingTemplate.js"></script>              <!-- keep this for the basic javascript functionalities -->
         <script src="../JavaScript/MyPicCoder.js"></script>
     </head>
+
+    <!-- START MODALS -->
+    <div class="ict-modal" id="example_modal">
+        <div class="ict-modal-content">
+            <div class="ict-modal-header">
+                <span class="ict-close" onclick="closeModal('example_modal')">
+                    &times;
+                </span>
+                <h2>
+                    Beispiel Bilder
+                </h2>
+            </div>
+            <div class="ict-modal-body">
+                <p>   
+                    <label for="example_type">
+                        Bildtyp:
+                    </label>
+                    <select id="example_type">
+                        <option value="pbm">
+                            PBM
+                        </option>
+                        <option value="pgm">
+                            PGM
+                        </option>
+                        <option value="ppm">
+                            PPM
+                        </option>
+                    </select> 
+                </p>  
+                <div class="ict-option_item">
+                    <label for="example_1">
+                        Smiley
+                    </label>
+                    <input type="radio" id="example_1" name="example" value="smiley" checked/>
+                </div>
+                <div class="ict-option_item">
+                    <label for="example_2">
+                        Haus
+                    </label>
+                    <input type="radio" id="example_2" name="example" value="house"/>
+                </div>
+                <div class="ict-option_item">
+                    <label for="example_3">
+                        Videospiel Sprite
+                    </label>
+                    <input type="radio" id="example_3" name="example" value="videogame_character"/>
+                </div>
+            </div>
+            <div class="ict-modal-footer">
+                <div class="spacer" style="clear: both;"></div>
+                <button onclick="uploadExample()" class="ict-modal-save" title="gewähltes Beispiel hochladen">
+                    <i class="fa-solid fa-file-arrow-up fa-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </div> 
+    <!-- END MODALS -->
+
     <body>   
         <div class="ict-range">
             <div class="ict-header">
@@ -29,6 +87,9 @@
                             <i class="fa-solid fa-folder-open fa-2xl"></i>
                         </label>
                         <input type="file" id="file-upload" class="file_uploader" onchange="tryFileUpload()"/>  
+                    </button>
+                    <button onclick="openModal('example_modal')" title="Beispielbild auswählen">
+                        <i class="fa-solid fa-file-arrow-up fa-2xl"></i>
                     </button>
                     <button onclick="toggleView('100%', '0%')" title="Code maximieren">
                         <i class="fa-solid fa-arrow-right fa-2xl"></i>
