@@ -36,40 +36,60 @@
                 </h2>
             </div>
             <div class="ict-modal-body">   
-                <label for="save_as">
-                    Heightmap/Texturemap speichern als:
-                </label>
-                <select id="save_as">
-                    <option value="pgm_ppm">
-                        PGM/PPM
-                    </option>
-                    <option value="jpg">
-                        JPG
-                    </option>
-                    <option value="png">
-                        PNG
-                    </option>
-                </select> 
-            
-                <div class="ict-option_item">
-                    <label for="save_heightmap">
-                        Heightmap speichern
-                    </label>
-                    <input type="checkbox" id="save_heightmap" checked/>
-                </div>
-            
-                <div class="ict-option_item">
-                    <label for="save_texturemap">
-                        Texturemap speichern
-                    </label>
-                    <input type="checkbox" id="save_texturemap" checked/>
-                </div>
-            
-                <div class="ict-option_item">
-                    <label for="save_terrain">
-                        Terrain speichern
-                    </label>
-                    <input type="checkbox" id="save_terrain" checked/>
+                <div class="ict-box">  
+                    <h2>
+                        Heightmap/Texturemap
+                    </h2>
+                    <div class="ict-option_items">
+                        <div class="ict-option_item">
+                            <label for="save_as">
+                                Speichern als:
+                            </label>
+                            <select id="save_as">
+                                <option value="pgm_ppm">
+                                    PGM/PPM
+                                </option>
+                                <option value="jpg">
+                                    JPG
+                                </option>
+                                <option value="png">
+                                    PNG
+                                </option>
+                            </select> 
+                        </div>
+                    
+                        <div class="ict-option_item">
+                            <label for="save_heightmap">
+                                Heightmap speichern
+                            </label>
+                            <input type="checkbox" id="save_heightmap" checked/>
+                        </div>
+                    
+                        <div class="ict-option_item">
+                            <label for="save_texturemap">
+                                Texturemap speichern
+                            </label>
+                            <input type="checkbox" id="save_texturemap" checked/>
+                        </div>
+                    </div>
+
+                    <h2>
+                        Geometrie
+                    </h2>
+                    <div class="ict-option_items">
+                        <div class="ict-option_item">
+                            <label for="geometry_name">
+                                Dateiname
+                            </label>
+                            <input id="geometry_name" class="ict-text_input" value="Terrain"></input>
+                        </div>
+                        <div class="ict-option_item">
+                            <label for="save_terrain">
+                                Terrain speichern
+                            </label>
+                            <input type="checkbox" id="save_terrain" checked/>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="ict-modal-footer">

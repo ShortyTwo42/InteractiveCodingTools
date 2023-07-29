@@ -3,7 +3,8 @@ import {
     update_terrain_texture, 
     update_terrain_geometry,
     update_terrain_material, 
-    update_textures
+    update_textures,
+    export_mesh
 } from 'modules/MyTerrainPreview.js';
 
 // initialize everything
@@ -916,7 +917,7 @@ function save_png(canvas, default_filename) {
 }
 
 function save_geometry() {
-    console.log('not yet implemented');
+    export_mesh();
 }
 
 export function uploadFile() {

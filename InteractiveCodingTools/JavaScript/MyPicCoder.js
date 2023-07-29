@@ -17,7 +17,7 @@ function uploadFile() {
             }
 
             let textarea = document.querySelector('.ict-code');
-            textarea.innerHTML = fileContent;
+            textarea.value = fileContent;
 
             // trigger 'keyup' event to have code enumeration
             let event = new KeyboardEvent('keyup', {});
@@ -47,8 +47,9 @@ function prepareFile(uint8Array) {
     const startIndex = skipWhiteSpace(uint8Array);
 
     // Check the first few bytes of the file after skipping white spaces
-    const isPPM = uint8Array[startIndex] === 0x50 && uint8Array[startIndex + 1] === 0x33; // PPM starts with "P3" or "P6"
-    const isPGM = uint8Array[startIndex] === 0x50 && uint8Array[startIndex + 1] === 0x32; // PGM starts with "P2" or "P5"
+    const isPPM = uint8Array[startIndex] === 0x50 && uint8Array[startIndex + 1] === 0x33; // PPM starts with "P3"
+    const isPGM = uint8Array[startIndex] === 0x50 && uint8Array[startIndex + 1] === 0x32; // PGM starts with "P2"
+    const isPBM = uint8Array[startIndex] === 0x50 && uint8Array[startIndex + 1] === 0x31; // PPM starts with "P1"
 
     let fileContent = -1;
     if (isPPM) {
@@ -57,7 +58,10 @@ function prepareFile(uint8Array) {
     } else if (isPGM) {
         fileContent = new TextDecoder().decode(uint8Array);
         fileContent = fileContent.trim();
-    }  
+    } else if (isPBM) {
+        fileContent = new TextDecoder().decode(uint8Array);
+        fileContent = fileContent.trim();
+    } 
 
     return fileContent;
 }
@@ -84,7 +88,6 @@ function downloadFile() {
 
     let fileName = document.getElementById('ict-fileName').value.trim().replace(/[\\\/:*?"<>|]/g, '');
     fileName = (fileName == '') ? 'Bild.' : fileName + '.';
-
 
     let link = document.createElement('a');
     link.href = url;
@@ -359,7 +362,7 @@ async function uploadExample() {
         if(fileContent) {
             
             const textarea = document.querySelector('.ict-code');
-            textarea.innerHTML = fileContent;
+            textarea.value = fileContent;
 
             display();
             

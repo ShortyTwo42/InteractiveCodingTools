@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Clock } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { STLExporter } from 'three/examples/jsm/exporters/STLExporter.js';
 
 document.addEventListener('DOMContentLoaded', function(){
     init_app();
@@ -170,7 +171,6 @@ function flatten2(array) {
 }
 
 export function update_terrain_heightmap() {
-
     texture_material.uniforms.displacementMap.value = new THREE.CanvasTexture(heightmap);
     texture_material.needsUpdate = true;
     wireframe_material.displacementMap.needsUpdate = true;
@@ -218,7 +218,7 @@ export function update_textures() {
 }
 
 export function update_terrain_geometry() {
-    
+
     geometry = create_terrain_geometry();
     
     terrain.geometry.dispose();     // Clear the existing geometry from memory to free up resources
@@ -521,4 +521,124 @@ function render() {
     update_light(delta);
 
     renderer.render(scene, camera);
+}
+
+export function export_mesh() {
+    const exporter = new STLExporter();
+
+    const options = { binary: true };
+
+    const currGeom = prepare_mesh();
+    const currTerrain = new THREE.Mesh(currGeom, texture_material);
+
+    const mesh_buffer = exporter.parse(currTerrain, options);
+
+    let fileName = document.getElementById('geometry_name').value.trim().replace(/[\\\/:*?"<>|]/g, '');
+    fileName = (fileName == '') ? 'Terrain.' : fileName + '.';
+
+    save_array_buffer(mesh_buffer, fileName, 'stl');
+}
+
+function save_array_buffer(buffer, fileName, extension) {
+    download_mesh(new Blob([buffer], {type: 'application/octet-stream'}), fileName, extension)
+}   
+
+function download_mesh(blob, fileName, extension) {
+    
+    const url = window.URL.createObjectURL(blob);
+
+    let link = document.createElement('a');
+    link.href = url;
+    link.download = fileName + extension;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    window.URL.revokeObjectURL(url);
+}
+
+function prepare_mesh() {
+    // get info
+    const resolution_x_val = Number(resolution_x.value);
+    const resolution_y_val = Number(resolution_y.value);
+    const scale = Number(terrain_scale.value);
+    const displacement_scale_val = Number(displacement_scale.value) / scale_divisor;
+
+    const scale_x = scale * resolution_x_val / Math.max(resolution_x_val, resolution_y_val);
+    const scale_y = scale * resolution_y_val / Math.max(resolution_x_val, resolution_y_val);
+
+    // get current heightmap data
+    const heightmap_texture = new THREE.CanvasTexture(heightmap);
+    const heightmap_data = heightmap_texture.image.getContext('2d', { willReadFrequently: true });
+    const heightmap_width = heightmap.width - 1;
+    const heightmap_height = heightmap.height - 1;
+
+    let vertices = [];
+    let normals = [];
+    let uvs = [];
+    let triangles = [];
+    let triangleIndex = 0;
+
+    for (let y = 0; y < resolution_y_val; y++) {
+        for (let x = 0; x < resolution_x_val; x++) {
+            const current_index = y * resolution_x_val + x;
+            
+            const percent = new THREE.Vector2(x / (resolution_x_val - 1), y / (resolution_y_val - 1));
+
+            const height_value = heightmap_data.getImageData(
+                percent.x * heightmap_width, 
+                percent.y * heightmap_height, 
+                1, 
+                1)
+            .data[0] / 255; 
+
+            const point_on_mesh = new THREE.Vector3(
+                ((percent.x - 0.5) * 2 * scale_x),
+                height_value * displacement_scale_val,
+                -((percent.y - 0.5) * 2 * scale_y),
+            )
+
+            vertices[current_index] = point_on_mesh;
+            normals[current_index] = new THREE.Vector3(0, 1, 0);
+            uvs[current_index] = percent;
+
+            if (x != (resolution_x_val - 1) && y != (resolution_y_val - 1)) {
+                triangles[triangleIndex] = current_index;
+                triangles[triangleIndex + 1] = current_index + resolution_x_val + 1;
+                triangles[triangleIndex + 2] = current_index + resolution_x_val;
+
+                triangles[triangleIndex + 3] = current_index;
+                triangles[triangleIndex + 4] = current_index + 1;
+                triangles[triangleIndex + 5] = current_index + resolution_x_val + 1;
+
+                triangleIndex += 6;
+            }
+        }
+    }
+
+    // transform into 1D arrays to push into the data structure
+    vertices = flatten3(vertices);
+    normals = flatten3(normals);
+    uvs = flatten2(uvs);
+
+    let new_geometry = new THREE.BufferGeometry();
+    new_geometry.setAttribute(
+        'position',
+        new THREE.BufferAttribute(new Float32Array(vertices), positionNumComponents)
+    );
+    new_geometry.setAttribute(
+        'normal',
+        new THREE.BufferAttribute(new Float32Array(normals), normalNumComponents)
+    );
+    new_geometry.setAttribute(
+        'uv',
+        new THREE.BufferAttribute(new Float32Array(uvs), uvNumComponents)
+    );
+    new_geometry.setIndex(triangles);
+
+    // recalc the normals
+    new_geometry.computeVertexNormals();
+
+    return new_geometry;
 }
