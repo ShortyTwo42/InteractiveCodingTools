@@ -12,7 +12,7 @@ function uploadFile() {
 
             if (fileContent == -1) {
                 // wrong format or couldn't process data
-                alert('Das Format wurde nicht erkannt oder es gab Probleme beim Auslesen der Daten, bitte versuchen Sie es mit einer anderen Datei vom Typen "pgm" oder "ppm"')
+                alert('Das Format wurde nicht erkannt oder es gab Probleme beim Auslesen der Daten, bitte versuchen Sie es mit einer anderen Datei vom Typen "pbm", "pgm", "ppm" oder "svg"')
                 return;
             }
 
@@ -61,7 +61,15 @@ function prepareFile(uint8Array) {
     } else if (isPBM) {
         fileContent = new TextDecoder().decode(uint8Array);
         fileContent = fileContent.trim();
-    } 
+    } else {
+        // check if it is an svg
+        fileContent = new TextDecoder().decode(uint8Array);
+        fileContent = fileContent.trim();
+
+        if(!(fileContent.startsWith('<svg') || fileContent.startsWith('<?xml') && fileContent.includes('<svg'))) {
+            fileContent = -1;
+        } 
+    }
 
     return fileContent;
 }
@@ -327,9 +335,32 @@ function preprocessFile(rawFile) {
     return processedFile;
 }
 
-// ToDo: add example images here
+function changeSVG() {
+    const example_type = document.getElementById('example_type').value;
+
+    const example_3_div = document.getElementById('example_3_div');
+    const example_4_div = document.getElementById('example_4_div');
+
+    if (example_type == 'xml') {
+        example_3_div.style.display = 'none';
+        example_4_div.style.display = '';
+
+        if(getSelectedRadioValue('example') == 'videogame_character') {
+            document.getElementById('example_4').checked = true;
+        }
+    } else {
+        example_3_div.style.display = '';
+        example_4_div.style.display = 'none';
+
+        if(getSelectedRadioValue('example') == 'file_icon') {
+            document.getElementById('example_3').checked = true;
+        }
+    }
+}
+
 async function uploadExample() {
-       
+      
+    // for SVGs we use the extension xml, so the live server doesn't inject javascript
     const example_type = document.getElementById('example_type').value;
     const value = getSelectedRadioValue('example');
     
@@ -347,6 +378,10 @@ async function uploadExample() {
             break;
         case 'videogame_character':
             fileUrl = '../Sample_Images/MyPicCoder/videogame_character.' + example_type;
+            fileName = value;
+            break;
+        case 'file_icon':
+            fileUrl = '../Sample_Images/MyPicCoder/file_icon.' + example_type;
             fileName = value;
             break;
     }

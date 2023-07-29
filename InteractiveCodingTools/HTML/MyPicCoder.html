@@ -19,21 +19,26 @@
                 </h2>
             </div>
             <div class="ict-modal-body">
-                <p>   
-                    <label for="example_type">
-                        Bildtyp:
-                    </label>
-                    <select id="example_type">
-                        <option value="pbm">
-                            PBM
-                        </option>
-                        <option value="pgm">
-                            PGM
-                        </option>
-                        <option value="ppm">
-                            PPM
-                        </option>
-                    </select> 
+                <p>
+                    <div class="ict-option_item">
+                        <label for="example_type">
+                            Bildtyp:
+                        </label>
+                        <select id="example_type" onchange="changeSVG()">
+                            <option value="pbm">
+                                PBM
+                            </option>
+                            <option value="pgm">
+                                PGM
+                            </option>
+                            <option value="ppm">
+                                PPM
+                            </option>
+                            <option value="xml">
+                                SVG
+                            </option>
+                        </select> 
+                    </div>   
                 </p>  
                 <div class="ict-option_item">
                     <label for="example_1">
@@ -47,11 +52,17 @@
                     </label>
                     <input type="radio" id="example_2" name="example" value="house"/>
                 </div>
-                <div class="ict-option_item">
+                <div class="ict-option_item" id="example_3_div">
                     <label for="example_3">
                         Videospiel Sprite
                     </label>
                     <input type="radio" id="example_3" name="example" value="videogame_character"/>
+                </div>
+                <div class="ict-option_item" style="display: none" id="example_4_div">
+                    <label for="example_4">
+                        File Icon
+                    </label>
+                    <input type="radio" id="example_4" name="example" value="file_icon"/>
                 </div>
             </div>
             <div class="ict-modal-footer">

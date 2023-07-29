@@ -1,0 +1,11 @@
+<svg viewBox="0 0 200 200">
+  <!-- Head -->
+  <circle cx="100" cy="100" r="80" fill="rgb(255, 255, 0)" stroke="rgb(0, 0, 0)" stroke-width="3"/>
+  
+  <!-- Eyes -->
+  <circle cx="70" cy="95" r="12"/>
+  <circle cx="130" cy="95" r="12"/>
+  
+  <!-- Mouth -->
+  <path d="M65 120, C75 150, 125 150, 135 120" fill="none" stroke="rgb(0, 0, 0)" stroke-width="3"/>
+</svg>
