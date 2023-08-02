@@ -275,7 +275,7 @@ function pngToCanvas(canvas, ctx, buffer) {
     image.src = imageURL;
 }
 
-function setFileInfoFromCanvas(canvas, ctx, type) {
+function setFileInfoFromCanvas(canvas, ctx) {
     // check if the image is a grayscale image
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 
@@ -730,9 +730,10 @@ function toggleFilterMenu() {
     const filterMenu = document.querySelector('.filter_menu');
     const codingSpace = document.querySelector('.ict-codingSpace');
     const previewSpace = document.querySelector('.ict-previewSpace');
+    const add_noise_button = document.getElementById('add_noise_button');
     const download_button = document.getElementById('download_button');
-
     const upload_button = document.getElementById('upload_button');
+    const example_button = document.getElementById('example_button');
     const max_original_button = document.getElementById('max_original_button');
     const split_screen_button = document.getElementById('split_screen_button');
     const max_filtered_button = document.getElementById('max_filtered_button');
@@ -746,8 +747,10 @@ function toggleFilterMenu() {
             codingSpace.style.display = display;
             previewSpace.style.display = display;
             filterMenu.style.display = '';
+            add_noise_button.disabled = true;
             download_button.disabled = true;
             upload_button.disabled = true;
+            example_button.disabled = true;
             max_original_button.disabled = true;
             split_screen_button.disabled = true;
             max_filtered_button.disabled = true;
@@ -758,8 +761,10 @@ function toggleFilterMenu() {
             codingSpace.style.display = '';
             previewSpace.style.display = '';
             filterMenu.style.display = 'none';
+            add_noise_button.disabled = false;
             download_button.disabled = false;
             upload_button.disabled = false;
+            example_button.disabled = false;
             max_original_button.disabled = false;
             split_screen_button.disabled = false;
             max_filtered_button.disabled = false;
@@ -1127,5 +1132,157 @@ async function uploadExample() {
         }
     } catch (error) {
         alert('Beim hochladen des Beispiels kam es zu einem Problem');
+    }
+}
+
+function add_image_noise() {
+    
+    if (currentPicture) {
+        
+        const image_noise = document.getElementById('image_noise').value;
+        const noise_percentage = Number(document.getElementById('noise_percentage').value) / 100;
+
+        switch (image_noise) {
+            case 'sp_noise':
+                add_salt_and_pepper(noise_percentage);
+                break;
+            case 'gaussian_noise':
+                add_gaussian_noise(noise_percentage);
+                break;
+        }
+
+        const canvas = document.getElementById('original_img');
+
+        if (currentPicture.type == 'pgm') {
+            pgmToCanvas(canvas, currentPicture);
+        }
+        else if (currentPicture.type == 'ppm') {
+            ppmToCanvas(canvas, currentPicture);
+        }
+    }
+    else {
+        // no pic uploaded yet
+        alert('Es wurde noch kein Bild hochgeladen');
+    }   
+}
+
+function add_salt_and_pepper(noise_percentage) {
+    
+    const numPixels = currentPicture.width * currentPicture.height;
+    const numNoisyPixels = Math.round(numPixels * noise_percentage);
+    
+    switch (currentPicture.type) {
+        case 'pgm':
+            for (let i = 0; i < numNoisyPixels; i++) {
+                // get random pixel
+                const x = Math.floor(Math.random() * currentPicture.width);
+                const y = Math.floor(Math.random() * currentPicture.height);
+        
+                // randomly choose if pixel should be black or white;
+                const col = Math.random() < 0.5 ? currentPicture.maxValue : 0;
+
+                // set pixel color
+                currentPicture.image[y][x] = col;
+            }
+            break;
+        case 'ppm':
+            for (let i = 0; i < numNoisyPixels; i++) {
+                // get random pixel
+                const x = Math.floor(Math.random() * currentPicture.width);
+                const y = Math.floor(Math.random() * currentPicture.height);
+        
+                // randomly choose if pixel should be black or white;
+                const col = Math.random() < 0.5 ? currentPicture.maxValue : 0;
+
+                // set pixel color
+                currentPicture.image[y][x][0] = col;
+                currentPicture.image[y][x][1] = col;
+                currentPicture.image[y][x][2] = col;
+            }
+            break;
+    }
+}
+
+function add_gaussian_noise(standard_deviation_percent) {
+    const mean = 0;
+    const standard_deviation = Math.round(currentPicture.maxValue * standard_deviation_percent);
+
+    switch (currentPicture.type) {
+        case 'pgm':
+            
+            for(let x = 0; x < currentPicture.width; x++) {
+                for(let y = 0; y < currentPicture.height; y++) {
+                    const noise = get_gaussian_random_value(mean, standard_deviation);
+        
+                    let col = currentPicture.image[y][x] + noise;
+
+                    // make sure, the values are in the allowed range
+                    col = Math.max(0, Math.min(currentPicture.maxValue, col));
+        
+                    // set pixel color
+                    currentPicture.image[y][x] = col;
+                }
+            }
+            
+            break;
+        case 'ppm':
+            
+            for(let x = 0; x < currentPicture.width; x++) {
+                for(let y = 0; y < currentPicture.height; y++) {
+                    const noise = get_gaussian_random_value(mean, standard_deviation);
+
+                    let r = currentPicture.image[y][x][0] + noise;
+                    let g = currentPicture.image[y][x][1] + noise;
+                    let b = currentPicture.image[y][x][2] + noise;
+
+                    // make sure, the values are in the allowed range
+                    r = Math.max(0, Math.min(currentPicture.maxValue, r));
+                    g = Math.max(0, Math.min(currentPicture.maxValue, g));
+                    b = Math.max(0, Math.min(currentPicture.maxValue, b));
+
+                    // set pixel color
+                    currentPicture.image[y][x][0] = r;
+                    currentPicture.image[y][x][1] = g;
+                    currentPicture.image[y][x][2] = b;
+                }
+            }
+
+            break;
+    }
+    
+}
+
+/**
+ * function taken from "https://stackoverflow.com/questions/25582882/javascript-math-random-normal-distribution-gaussian-bell-curve"
+ * changed up for my own purposes
+ */
+function get_gaussian_random_value(mean, standard_deviation) {
+    let u = 0;
+    let v = 0;
+    
+    while(u === 0) {
+        u = Math.random(); //Converting [0,1) to (0,1)
+    }
+    while(v === 0) {
+        v = Math.random(); //Converting [0,1) to (0,1)
+    }
+
+    const noise = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    
+    return noise * standard_deviation + mean;
+}
+
+function update_noise_strength() {
+    
+    const image_noise = document.getElementById('image_noise').value;
+    const noise_percentage_label = document.getElementById('noise_percentage_label');
+
+    switch(image_noise) {
+        case 'sp_noise':
+            noise_percentage_label.innerHTML = 'Rauschanteil (%)';
+            break;
+        case 'gaussian_noise':
+            noise_percentage_label.innerHTML = 'Rauschstärke (%)';
+            break;
     }
 }

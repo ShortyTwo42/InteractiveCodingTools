@@ -144,6 +144,41 @@
                         <input type="number" id="ict-fileHeight" value="0" readonly></input>
                     </div>
                 </div>
+                <div class="ict-subHeader">
+                    <div class="ict-subHeaderItem">
+                        <label for="image_noise">
+                            Bildrauschen
+                        </label>
+                        <select id="image_noise" onchange="update_noise_strength()">
+                            <option value="sp_noise">
+                                Salz und Pfeffer
+                            </option>
+                            <option value="gaussian_noise">
+                                Gauß
+                            </option>
+                        </select> 
+                    </div>
+
+                    <div class="ict-subHeaderItem">
+                        <div class="ict-option_item">
+                            
+                            <label for="noise_percentage" id="noise_percentage_label">
+                                Rauschanteil (%)
+                            </label>
+                            <div class="ict-number_container">
+                                <button onclick="decreaseNumber('noise_percentage')" class="decrease_button">-</button>
+                                <input type="number" min="0" max="100" step="10" class="ict-numbers bigger_width" id="noise_percentage" value="1"/>
+                                <button onclick="increaseNumber('noise_percentage')" class="increase_button">+</button>
+                            </div>
+                            
+
+                            <button onclick="add_image_noise()" title="Bildrauschen hinzufügen" id="add_noise_button">
+                                <i class="fa-solid fa-square-check fa-2xl"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                </div>
                 <div class="ict-menu">
                     <button onclick="openModal('save_modal')" id="download_button">
                         <i class="fa-solid fa-floppy-disk fa-2xl"></i>
@@ -154,7 +189,7 @@
                         </label>
                         <input type="file" id="file-upload" accept="image/x-portable-graymap, image/x-portable-pixmap" class="file_uploader" onchange="tryFileUpload()"/>  
                     </button>
-                    <button onclick="openModal('example_modal')" title="Beispielbild auswählen">
+                    <button onclick="openModal('example_modal')" title="Beispielbild auswählen" id="example_button">
                         <i class="fa-solid fa-file-arrow-up fa-2xl"></i>
                     </button>
                     <button onclick="toggleView('100%', '0%')" title="Original maximieren" id="max_original_button">
