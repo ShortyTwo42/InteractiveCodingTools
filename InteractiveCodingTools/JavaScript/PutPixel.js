@@ -1,4 +1,4 @@
-const maximumExecutionTime = 3000;
+const maxAllowedTime = 3000;
 let picture_width;
 let picture_height;
 let myPic;
@@ -64,31 +64,62 @@ function executeCode() {
     display.innerHTML = svgFile; 
 }
 
-// whitelisted functions, variables
+// whitelisted functions
 const allowed_functions = ['putPixel', 'for', 'if'];
-const functionCallRegex = /\b\w+\s*\(\s*\)/g;
+const functionCallRegex = /\b\w+\.\w+\s*\(\s*[^)]*\s*\)/g;
 
 // only allow certain functions and API calls
 function check_code_saefty(code) {
 
     const non_whitelisted_functions = code.match(functionCallRegex) || []
-        .map(match => match.trim().replace('(', ''))
+        .map(match => match.match(/\b\w+\.\w+/)[0])
         .filter(func => !allowed_functions.includes(func));
 
     if (non_whitelisted_functions.length > 0) {
-        alert('Bitte verwende nur "for-Schleifen", "if-Abfragen" oder die Funktion "putPixel"');
+        let string = 'Diese Funktionsaufrufe haben die Durchführung verhindert:\n';
+        for (let i = 0; i < non_whitelisted_functions.length; i++) {
+            string += non_whitelisted_functions[i] + '\n';
+        }
+        alert('Bitte verwende nur "for-Schleifen", "if-Abfragen" oder die Funktion "putPixel"\n' + string);
         return '';
     }
 
-    //add timeout to function to terminate it, if it takes too long
-    let safe_code = code;
-    
-    return safe_code;
+    return addTimeout(code);
 }
 
-function executeWithTimeout(func, timeout) {
-    
-    
+const timeLimitText = '"Das erlaubte Zeitlimit für die Durchführung des Codes wurde überschritten. Möglicherweise gibt es eine Endlosschleife oder eine Schleife wird zu häufig aufgerufen."';
+
+function addTimeout(userCode) {
+    // we add this code after every loop call, to break the function, if it takes too long (prevents infinite loops)
+    let addCode = 'if (should_stop(startTime)) {\n';
+    addCode += '\talert('+ timeLimitText + ');\n';
+    addCode += '\treturn;\n';
+    addCode += '}\n';
+
+    const lines = userCode.split('\n');
+    const modifiedLines = [];
+
+    modifiedLines.push('const startTime = new Date().getTime();\n');
+  
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.includes('for (') || line.includes('while (') || line.includes('do {')) {
+            modifiedLines.push(line);
+            modifiedLines.push(addCode);
+        } 
+        else {
+            modifiedLines.push(line);
+        }
+    }
+    return modifiedLines.join('\n');
+}
+
+// we call this function to check if we should break our current function because it takes too much time
+function should_stop(startTime) {
+    const currentTime = new Date().getTime();
+    const elapsedTime = currentTime - startTime;
+
+    return elapsedTime > maxAllowedTime;
 }
 
 function updateOutput() {
