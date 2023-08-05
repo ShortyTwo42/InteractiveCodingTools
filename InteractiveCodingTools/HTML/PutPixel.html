@@ -14,16 +14,29 @@
                 </h1>
                 <div class="ict-subHeader">
                     <div class="ict-subHeaderItem">
-                        <label for="ict-fileWidth">
-                            Breite
-                        </label>
-                        <input type="number" id="ict-fileWidth" onchange="updateOutput()"></input>
+                        <div class="ict-option_item">
+                            <label for="ict-fileWidth">
+                                Breite
+                            </label>
+                            <div class="ict-number_container">
+                                <button onclick="decreaseNumber('ict-fileWidth')" class="decrease_button">-</button>
+                                <input type="number" min="1" max="256" step="10" class="ict-numbers bigger_width" id="ict-fileWidth"/>
+                                <button onclick="increaseNumber('ict-fileWidth')" class="increase_button">+</button>
+                            </div>
+                        </div>
                     </div>
+
                     <div class="ict-subHeaderItem">
-                        <label for="ict-fileHeight">
-                            Höhe
-                        </label>
-                        <input type="number" id="ict-fileHeight" onchange="updateOutput()"></input>
+                        <div class="ict-option_item">
+                            <label for="ict-fileHeight">
+                                Höhe
+                            </label>
+                            <div class="ict-number_container">
+                                <button onclick="decreaseNumber('ict-fileHeight')" class="decrease_button">-</button>
+                                <input type="number" min="1" max="256" step="10" class="ict-numbers bigger_width" id="ict-fileHeight"/>
+                                <button onclick="increaseNumber('ict-fileHeight')" class="increase_button">+</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="ict-menu">

@@ -1,9 +1,18 @@
-const maxAllowedTime = 3000;
+const maxAllowedTime = 5000;
 let picture_width;
 let picture_height;
 let myPic;
 
+let file_width = null;
+let file_height = null;
+
 document.addEventListener('DOMContentLoaded', function() {
+    file_width = document.getElementById('ict-fileWidth');
+    file_height = document.getElementById('ict-fileHeight');
+    
+    file_width.addEventListener('input', updateOutput);
+    file_height.addEventListener('input', updateOutput);
+
     resetToDefault();
 }, false);
 
@@ -12,8 +21,8 @@ function resetToDefault() {
     picture_width = 10;
     picture_height = 10;
 
-    document.getElementById('ict-fileWidth').value = picture_width;
-    document.getElementById('ict-fileHeight').value = picture_height;
+    file_width.value = picture_width;
+    file_height.value = picture_height;
 
     let defaultCode = ''
     defaultCode += 'for (let y = 0; y < picture_height; y++) {\n'
@@ -87,7 +96,7 @@ function check_code_saefty(code) {
     return addTimeout(code);
 }
 
-const timeLimitText = '"Das erlaubte Zeitlimit für die Durchführung des Codes wurde überschritten. Möglicherweise gibt es eine Endlosschleife oder eine Schleife wird zu häufig aufgerufen."';
+const timeLimitText = '"Das erlaubte Zeitlimit (5 Sekunden) für die Durchführung des Codes wurde überschritten. Möglicherweise gibt es eine Endlosschleife oder eine Schleife wird zu häufig aufgerufen."';
 
 function addTimeout(userCode) {
     // we add this code after every loop call, to break the function, if it takes too long (prevents infinite loops)
@@ -123,8 +132,13 @@ function should_stop(startTime) {
 }
 
 function updateOutput() {
-    picture_width = parseInt(document.getElementById('ict-fileWidth').value);
-    picture_height = parseInt(document.getElementById('ict-fileHeight').value);
+    
+    picture_width = parseInt(file_width.value);
+    picture_height = parseInt(file_height.value);
+
+    picture_width = Math.max(file_width.min, Math.min(file_width.max, picture_width));
+    picture_height = Math.max(file_height.min, Math.min(file_height.max, picture_height));
+
     tryExecuteCode();
 }
 
@@ -166,4 +180,12 @@ function createSVG() {
     }
 
     return svg;
+}
+
+function handleDecrease() {
+    updateOutput();
+}
+
+function handleIncrease() {
+    updateOutput();
 }
