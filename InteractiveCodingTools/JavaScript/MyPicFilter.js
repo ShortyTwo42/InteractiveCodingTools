@@ -460,17 +460,17 @@ function applyMedian(canvas) {
                     case 'pgm':
                         // sort array
                         let col = quicksort(median_array);
-                        col = col[(median_array.length - 1) / 2]
+                        col = col[(median_array.length - 1) / 2];
                         filteredPicture.image[y][x] = col;
                         break;
                     case 'ppm':
                         // sort arrays
                         let r = quicksort(median_array.r);
-                        r = r[(median_array.r.length - 1) / 2]
+                        r = r[(median_array.r.length - 1) / 2];
                         let g = quicksort(median_array.g);
-                        g = g[(median_array.g.length - 1) / 2]
+                        g = g[(median_array.g.length - 1) / 2];
                         let b = quicksort(median_array.b);
-                        b = b[(median_array.b.length - 1) / 2]
+                        b = b[(median_array.b.length - 1) / 2];
                         filteredPicture.image[y][x][0] = r;
                         filteredPicture.image[y][x][1] = g;
                         filteredPicture.image[y][x][2] = b;
@@ -709,7 +709,7 @@ function convolve1D(input_img, kernel, kernel_divisor, direction, border_treatme
 
 function pascal_triangle(length) {
 
-    // to get an array of length n we look at row = lenght - 1
+    // to get an array of length n we look at row = length - 1
     let row = length - 1;
 
     // init prev element and return array
@@ -869,7 +869,7 @@ function quicksort(array) {
     }
     
     return quicksort(left).concat(pivot, quicksort(right));
-};
+}
 
 function downloadFile() {
 
