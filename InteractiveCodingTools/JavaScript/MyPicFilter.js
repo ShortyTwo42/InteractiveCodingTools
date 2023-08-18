@@ -691,13 +691,13 @@ function convolve1D(input_img, kernel, kernel_divisor, direction, border_treatme
                 switch (currentPicture.type) {
                     case 'pgm':
                         // divide by divisor to normalize the new value
-                        return_img[y][x] = new_value / kernel_divisor;
+                        return_img[y][x] = Math.round(new_value / kernel_divisor);
                         break;
                     case 'ppm':
                         // divide by divisor to normalize the new values
-                        return_img[y][x][0] = new_value.r / kernel_divisor;
-                        return_img[y][x][1] = new_value.g / kernel_divisor;
-                        return_img[y][x][2] = new_value.b / kernel_divisor;
+                        return_img[y][x][0] = Math.round(new_value.r / kernel_divisor);
+                        return_img[y][x][1] = Math.round(new_value.g / kernel_divisor);
+                        return_img[y][x][2] = Math.round(new_value.b / kernel_divisor);
                         break;
                 }
             }  
