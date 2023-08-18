@@ -46,6 +46,14 @@
     max-width: 15rem;
 }
 
+#original_img {
+    image-rendering: pixelated;
+}
+
+#filtered_img {
+    image-rendering: pixelated;
+}
+
 @media (max-width: 800px) {
     .range {
         flex-direction: column;

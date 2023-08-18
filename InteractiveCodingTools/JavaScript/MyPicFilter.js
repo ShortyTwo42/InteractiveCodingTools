@@ -1217,7 +1217,7 @@ function add_gaussian_noise(standard_deviation_percent) {
                     let col = currentPicture.image[y][x] + noise;
 
                     // make sure, the values are in the allowed range
-                    col = Math.max(0, Math.min(currentPicture.maxValue, col));
+                    col = Math.round(Math.max(0, Math.min(currentPicture.maxValue, col)));
         
                     // set pixel color
                     currentPicture.image[y][x] = col;
