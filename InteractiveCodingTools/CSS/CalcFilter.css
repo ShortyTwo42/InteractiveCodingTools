@@ -1,0 +1,61 @@
+.myContainer {
+    overflow-x: auto;
+    padding: 0.5rem 1rem;
+}
+
+.grid_container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    width: 30rem;
+    margin: 0 auto;
+}
+
+.grid_item {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    text-align: center;
+}
+
+.myBtn {
+    padding: 1rem 2rem;
+    margin: 1rem 0rem;
+    cursor: pointer;
+    display: inline-block;
+    color: var(--gray);
+    border: 1px solid var(--gray);
+    border-radius: 0.5rem;
+}
+
+.mySolutionBtn {
+    padding: 1rem 1rem;
+    cursor: pointer;
+    display: inline-block;
+    color: var(--gray);
+    border: 1px solid var(--gray);
+    border-radius: 2rem;
+}
+
+.myBtn:hover {
+    background-color: #eee;
+}
+
+.myInput {
+    margin: 1rem 0rem;
+    padding: 1rem 2rem;
+    width: fit-content;
+    border: 1px solid var(--gray);
+    border-radius: 0.5rem;
+}
+
+.success_text {
+    color: rgb(140, 201, 111);
+}
+
+.disabled_text {
+    color: rgb(174, 174, 174);
+}
+
+.error_text {
+    color: red;
+}

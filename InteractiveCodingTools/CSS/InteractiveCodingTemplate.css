@@ -227,27 +227,31 @@ button:disabled>.file_upload_label {
 /* Custom Scrollbar */
 .ict-previewSpace::-webkit-scrollbar,
 .ict-code::-webkit-scrollbar,
-.ict-wrapper::-webkit-scrollbar {
+.ict-wrapper::-webkit-scrollbar,
+.myContainer::-webkit-scrollbar  {
     width: 0.5rem;
     height: 0.5rem;
 }
 
 .ict-previewSpace::-webkit-scrollbar-track,
 .ict-code::-webkit-scrollbar-track,
-.ict-wrapper::-webkit-scrollbar-track {
+.ict-wrapper::-webkit-scrollbar-track,
+.myContainer::-webkit-scrollbar-track {
     background: transparent; 
 }
  
 .ict-previewSpace::-webkit-scrollbar-thumb,
 .ict-code::-webkit-scrollbar-thumb,
-.ict-wrapper::-webkit-scrollbar-thumb {
+.ict-wrapper::-webkit-scrollbar-thumb,
+.myContainer::-webkit-scrollbar-thumb {
     background: var(--gray); 
     border-radius: 1rem;
 }
   
 .ict-previewSpace::-webkit-scrollbar-thumb:hover,
 .ict-code::-webkit-scrollbar-thumb:hover,
-.ict-wrapper::-webkit-scrollbar-thumb:hover {
+.ict-wrapper::-webkit-scrollbar-thumb:hover,
+.myContainer::-webkit-scrollbar-thumb:hover {
     background: var(--emperor);
 }
 
