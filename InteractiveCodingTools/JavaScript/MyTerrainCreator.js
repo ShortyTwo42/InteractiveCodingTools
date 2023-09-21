@@ -340,7 +340,7 @@ function getMousePosition(e) {
 // functions to handle zooming and panning
 function handleZoom(e) {
     e.preventDefault();
-    const delta = e.deltaY > 0 ? 0.1 : -0.1;
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
     const oldZoom = currentZoom;
     // makes sure our zoom stays inside its bounds
     currentZoom = Math.min(Math.max(currentZoom + delta, minZoom), maxZoom); 
