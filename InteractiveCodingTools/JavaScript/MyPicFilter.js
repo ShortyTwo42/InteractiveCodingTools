@@ -1071,7 +1071,6 @@ function save_png(image_source) {
     window.URL.revokeObjectURL(url);
 }
 
-// ToDo: add example images here
 async function uploadExample() {
         
     const example_type = document.getElementById('example_type').value;

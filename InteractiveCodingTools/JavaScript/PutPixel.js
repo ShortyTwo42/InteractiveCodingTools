@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     file_width.addEventListener('input', updateOutput);
     file_height.addEventListener('input', updateOutput);
 
-    resetToDefault();
+    //resetToDefault();
 }, false);
 
 function resetToDefault() {
@@ -33,12 +33,16 @@ function resetToDefault() {
     defaultCode += '\t}\n'
     defaultCode += '}'
 
-    let textarea = document.querySelector('.ict-code');
+    const textarea = document.getElementById('editing');
 
     textarea.value = defaultCode;
 
     // trigger 'keyup' event to have code enumeration
     let event = new KeyboardEvent('keyup', {});
+    textarea.dispatchEvent(event);
+
+    // trigger 'input' event to have syntax highlighting
+    event = new KeyboardEvent('input', {});
     textarea.dispatchEvent(event);
 
     tryExecuteCode();
@@ -60,7 +64,7 @@ function executeCode() {
     // reset myPic as 2d array
     myPic = Array.from({ length: numRows }, () => Array(numCols).fill([255, 255, 255]));
 
-    const code = document.querySelector('.ict-code').value;
+    const code = document.getElementById('editing').value;
 
     const safe_code = check_code_saefty(code);
 

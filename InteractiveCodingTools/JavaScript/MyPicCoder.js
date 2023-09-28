@@ -23,6 +23,10 @@ function uploadFile() {
             let event = new KeyboardEvent('keyup', {});
             textarea.dispatchEvent(event);
 
+            // trigger 'input' event to have syntax highlighting
+            event = new KeyboardEvent('input', {});
+            textarea.dispatchEvent(event);
+
             display();
         }
 
@@ -405,6 +409,10 @@ async function uploadExample() {
 
             // trigger 'keyup' event to have code enumeration
             let event = new KeyboardEvent('keyup', {});
+            textarea.dispatchEvent(event);
+
+            // trigger 'input' event to have syntax highlighting
+            event = new KeyboardEvent('input', {});
             textarea.dispatchEvent(event);
         }
     } catch (error) {

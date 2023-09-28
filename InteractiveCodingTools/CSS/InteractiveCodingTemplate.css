@@ -152,54 +152,12 @@ button:disabled>.file_upload_label {
     overflow-y: scroll;
 }
 
-.ict-editor {
-    width: 100%;
-    height: 99%;
-    display: inline-flex;
-    font-family: monospace;
-    line-height: 1.3rem;
-    background: var(--mine_shaft);
-}
-
 .mine_shaft-background {
     background: var(--mine_shaft);
 }
 
 .white-background {
     background: var(--white);
-}
-
-.ict-lineNumbers {
-    min-width: 1.5rem;
-    text-align: right;
-    position: sticky;
-    left: 0;
-    padding-right: 1rem;
-    background: var(--mine_shaft);
-}
-
-.ict-lineNumbers span {
-    counter-increment: linenumber;
-}
-
-.ict-lineNumbers span:before {
-    content: counter(linenumber);
-    display: block;
-    color: var(--alto);
-}
-
-.ict-code {
-    width: 100%;
-    line-height: 1.3rem;
-    overflow-y: hidden;
-    overflow-x: hidden;
-    white-space: pre-wrap;
-    padding: 0;
-    border: 0;
-    background: var(--mine_shaft);
-    color: var(--white);
-    outline: none;
-    resize: none
 }
 
 .ict-previewSpace {
@@ -413,7 +371,7 @@ input[type="number"] {
 .ict-modal {
     display: none;
     position: fixed;
-    z-index: 1;
+    z-index: 3;
     left: 0;
     top: 0;
     width: 100%;
@@ -464,6 +422,100 @@ input[type="number"] {
 .ict-modal-save {
     float: right;
 }
+
+
+
+/* EDITING */
+.ict-editor {
+    width: 100%;
+    height: 99%;
+    display: inline-flex;
+    font-family: monospace;
+    font-size: 1rem;
+    line-height: 1.3rem;
+    background: var(--mine_shaft);
+}
+
+.ict-lineNumbers {
+    z-index: 2;
+    min-width: 1.5rem;
+    text-align: right;
+    position: sticky;
+    left: 0;
+    padding-right: 1rem;
+    background: var(--mine_shaft);
+}
+
+.ict-lineNumbers span {
+    counter-increment: linenumber;
+}
+
+.ict-lineNumbers span:before {
+    content: counter(linenumber);
+    display: block;
+    color: var(--alto);
+}
+
+.ict-editing {
+    position: relative;
+    width: 100%;
+    font-family: monospace;
+    font-size: 1rem;
+    line-height: 1.3rem;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    padding: 0;
+    border: 0;
+    background: var(--mine_shaft);
+    color: var(--white);
+    outline: none;
+    resize: none
+}
+
+/* SYNTAX HIGHLIGHTING */
+/* 
+ *  syntax highlighting taken from 
+ *  "https://css-tricks.com/creating-an-editable-textarea-that-supports-syntax-highlighted-code/".
+ *  Few adjustments were made for our purposes
+ */
+#editing, #highlighting, #highlighting * {
+    font-family: monospace;
+    line-height: 1.3rem;
+    tab-size: 2;
+    font-size: 1rem;
+}
+
+#editing, #highlighting {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+/* Move the textarea in front of the result */
+#editing {
+    z-index: 1;
+    color: transparent;
+    outline: none;
+    background: transparent;
+    caret-color: white; /* Or choose your favorite color */
+    resize: none;
+    white-space: pre-wrap; 
+}
+  
+#highlighting {
+    box-shadow: none;
+    z-index: 0;
+    background: var(--mine_shaft);
+    white-space: nowrap; 
+}
+/* END SYNTAX HIGHLIGHTING */
+
 
 @media (max-width: 800px) {
     .ict-subHeader {

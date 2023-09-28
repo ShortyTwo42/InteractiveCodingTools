@@ -2,34 +2,7 @@
 // add line numbers to our editor
 document.addEventListener('DOMContentLoaded', function(){
     initIctNumbers();
-    try {
-        const editor = document.querySelector('.ict-editor');
-        const textarea = document.querySelector('.ict-code');
-        const lineNumbers = document.querySelector('.ict-lineNumbers');
-
-        textarea.addEventListener('keyup', event => {
-            const numberOfLines = event.target.value.split('\n').length;
-            lineNumbers.innerHTML = Array(numberOfLines).fill('<span></span>').join('');
-            let newWidth = calcWidth(textarea.value);
-            textarea.style.minWidth = newWidth + 'ch';
-            editor.style.minWidth = (newWidth + 6) + 'ch';
-
-            let newHeight = calcHeight(textarea.value) + 'rem';
-            textarea.style.minHeight = newHeight;
-            editor.style.minHeight = newHeight;
-        });
-
-        // prevent 'tab' press from jumping to next input and do normal tab instead
-        textarea.onkeydown = function(e) {
-            if (e.keyCode === 9) {
-                this.setRangeText('\t', this.selectionStart, this.selectionStart, 'end');
-                return false;
-            }
-        }
-    } 
-    catch {
-
-    }
+    initIctEditor();
 });
 
 function initIctNumbers() {
@@ -179,4 +152,80 @@ function getSelectedRadioValue(name) {
     }
 
     return null;
+}
+
+function initIctEditor() {
+    // check if an editor exists, if that's the case initialize it
+    const editor = document.querySelector('.ict-editor');
+
+    if (editor) {
+        const editor = document.querySelector('.ict-editor');
+        const editing = document.querySelector('.ict-editing');
+        const textarea = document.getElementById('editing');
+        const highlighting = document.getElementById('highlighting');
+        const lineNumbers = document.querySelector('.ict-lineNumbers');
+        
+        textarea.addEventListener('keydown', function(event) {
+            handleLineNumbers(event, editor, editing, textarea, highlighting, lineNumbers);
+            check_tab(textarea, event);
+        });
+
+        textarea.addEventListener('keyup', function(event) {
+            handleLineNumbers(event, editor, editing, textarea, highlighting, lineNumbers);
+        });
+
+        textarea.addEventListener('input', function() {
+            update_syntax(textarea.value);
+        }); 
+    }
+}
+
+function handleLineNumbers(event, editor, editing, textarea, highlighting, lineNumbers) { 
+    const numberOfLines = event.target.value.split('\n').length;
+    lineNumbers.innerHTML = Array(numberOfLines).fill('<span></span>').join('');
+    const newWidth = calcWidth(textarea.value);
+    
+    textarea.style.minWidth = newWidth + 'ch';
+    highlighting.style.minWidth = newWidth + 'ch';
+    editor.style.minWidth = (newWidth + 4) + 'ch';
+    editing.style.minWidth = (newWidth + 4) + 'ch';
+
+    const newHeight = calcHeight(textarea.value) + 'rem';
+    textarea.style.minHeight = newHeight;
+    highlighting.style.minHeight = newHeight;
+    editor.style.minHeight = newHeight;
+    editing.style.minHeight = newHeight;
+}
+
+/* 
+ *  syntax highlighting taken from 
+ *  "https://css-tricks.com/creating-an-editable-textarea-that-supports-syntax-highlighted-code/".
+ *  Few adjustments were made for our purposes
+ */
+function update_syntax(text) {
+    let result_element = document.querySelector('#highlighting-content');
+     // Handle final newlines (see article)
+    if(text[text.length-1] == '\n') { // If the last character is a newline character
+        text += ' '; // Add a placeholder space character to the final line 
+    }
+    // Update code
+    result_element.innerHTML = text.replace(new RegExp('&', 'g'), '&amp').replace(new RegExp('<', 'g'), '&lt').replace(new RegExp('>', 'g'), '&gt');
+    // Syntax Highlight
+    Prism.highlightElement(result_element);
+}
+
+function check_tab(element, event) {
+    const code = element.value;
+    if(event.key == 'Tab') {
+        /* Tab key pressed */
+        event.preventDefault(); // stop normal
+        const before_tab = code.slice(0, element.selectionStart); // text before tab
+        const after_tab = code.slice(element.selectionEnd, element.value.length); // text after tab
+        const cursor_pos = element.selectionEnd + 1; // where cursor moves after tab - moving forward by 1 char to after tab
+        element.value = before_tab + "\t" + after_tab; // add tab char
+        // move cursor
+        element.selectionStart = cursor_pos;
+        element.selectionEnd = cursor_pos;
+        update_syntax(element.value); // Update text to include indent
+    }
 }
