@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     file_width.addEventListener('input', updateOutput);
     file_height.addEventListener('input', updateOutput);
 
-    //resetToDefault();
+    resetToDefault();
 }, false);
 
 function resetToDefault() {
