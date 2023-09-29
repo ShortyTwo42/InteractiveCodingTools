@@ -53,6 +53,14 @@ function tryExecuteCode() {
         executeCode();
     } catch {
         console.log('something went wrong!');
+
+        let alert_string = 'Bei der Ausführung des Codes ist ein Fehler aufgetreten.\n';
+        alert_string    += 'Überprüfe, ob alle Klammern "{, }, (, )" geschlossen wurden,\n';
+        alert_string    += 'ob du "picture_height" und "picture_width" korrekt geschrieben hast,\n';
+        alert_string    += 'und ob du putPixel korrekt aufgerufen hast. Im Notfall kannst du\n';
+        alert_string    += 'den Code auch in seinen funktionierenden Ausgangszustand zurücksetzen.';
+
+        alert(alert_string);
     }
 }
 
