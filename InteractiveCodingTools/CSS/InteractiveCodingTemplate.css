@@ -8,6 +8,7 @@
     --tundora: #454545;
     --mine_shaft: #232323;
     --active_elem: #1871ac;
+    --active_elem: #fa0d00;
 }
 
 html, body {
@@ -225,6 +226,10 @@ button:disabled>.file_upload_label {
     float: right;
 }
 
+.float-right_tutorial {
+    float: right;
+}
+
 .ict-switch {
     position: relative;
     display: inline-block;
@@ -377,7 +382,7 @@ input[type="number"] {
     width: 100%;
     height: 100%;
     overflow: auto; 
-    background-color: rgba(0,0,0,0.4); 
+    background-color: rgba(0, 0, 0, 0.25); 
 }
 
 .ict-modal-content {
@@ -422,8 +427,6 @@ input[type="number"] {
 .ict-modal-save {
     float: right;
 }
-
-
 
 /* EDITING */
 .ict-editor {
@@ -516,6 +519,68 @@ input[type="number"] {
 }
 /* END SYNTAX HIGHLIGHTING */
 
+/* START Tutorial Elements */
+#ict-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.25);
+    z-index: 5;
+    display: none;
+}
+
+#ict-tutorial_toast {
+    max-width: 30%;
+    position: absolute;
+    background: var(--tundora);
+    color: var(--white);
+    border: none;
+    border-radius: 0.5rem;
+    z-index: 6;
+    display: none;
+}
+
+.ict-tutorial_header {
+    padding: 0.2rem 0.5rem;
+}
+
+.ict-tutorial_header>h3 {
+    margin: 0.7rem 0rem;
+}
+
+.ict-tutorial_body {
+    padding: 1rem 0.5rem;
+    border-style: solid;
+    border-width: 0.1rem 0rem 0.1rem 0rem;
+}
+  
+.ict-tutorial_footer {
+    padding: 0.2rem 0.5rem;
+    overflow: auto;
+}
+
+.ict-focused_element {
+    border: 0.2rem solid var(--active_elem); 
+}
+
+.ict-tutorial_button {
+    border-color: var(--white);
+    border-style: solid;
+    border-width: 0.2rem;
+    border-radius: 0.4rem;
+    width: 100%;
+    padding: 0.5rem 1rem;
+}
+
+.ict-tutorial_button:hover {
+    border-color: var(--silver_chalice);
+    border-style: solid;
+    border-width: 0.2rem;
+    border-radius: 0.4rem;
+}
+/* END Tutorial Elements */
 
 @media (max-width: 800px) {
     .ict-subHeader {

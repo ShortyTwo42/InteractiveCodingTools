@@ -1,5 +1,5 @@
 <!-- 
-    This is an html template to create a new interactive coding Tool (ict).
+    This is an html template to create a new Interactive Coding Tool (ict).
     Feel free to use it and to create new tools
     author: Leon Endris
 -->
@@ -10,9 +10,60 @@
         <link rel="stylesheet" href="../CSS/fontawesome/css/all.min.css">               <!-- keep this for fontawesome icons (save, load, ...) -->
         <link rel="stylesheet" href="../CSS/InteractiveCodingTemplate.css">             <!-- keep this for the representation of the tool -->
         <link rel="stylesheet" href="../PrismJS/prism.css">                             <!-- keep this for syntax highlighting -->
+        <script src="../JavaScript/Tutorial.js"></script>                               <!-- keep this if you want to add tutorials to the tool -->
         <script src="../JavaScript/InteractiveCodingTemplate.js"></script>              <!-- keep this for the basic javascript functionalities -->
         <script src="../PrismJS/prism.js"></script>                                     <!-- keep this for syntax highlighting -->
     </head>
+    
+    <div id="ict-overlay"></div>
+    <div id="ict-tutorial_toast">
+        <div class="ict-tutorial_header">
+            <span class="ict-close" onclick="hideTutorial()">
+                &times;
+            </span>
+            <h3 id="ict-tutorial_title">Test</h3>
+        </div>
+        <div class="ict-tutorial_body">
+            <div id="ict-tutorial_content"></div>
+        </div>
+        <div class="ict-tutorial_footer">
+            <button id="ict-tutorial_prev">
+                <i class="fa-solid fa-angle-left fa-2xl"></i>
+            </button>
+            <button id="ict-tutorial_next" class="float-right_tutorial">
+                <i class="fa-solid fa-angle-right fa-2xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- START MODALS -->
+    <div class="ict-modal" id="tutorial_modal">
+        <div class="ict-modal-content">
+            <div class="ict-modal-header">
+                <span class="ict-close" onclick="closeModal('tutorial_modal')">
+                    &times;
+                </span>
+                <h2>
+                    Tutorials
+                </h2>
+            </div>
+            <div class="ict-modal-body">
+                <p>
+                    Wähle ein Tutorial aus
+                </p>
+                <p>
+                    <button class="ict-tutorial_button" onclick="startTutorial('ict_test', 'Test Tutorial'); closeModal('tutorial_modal');">
+                        <label>Hallo Welt</label>
+                    </button>
+                </p>
+            </div>
+            <div class="ict-modal-footer">
+                <div class="spacer" style="clear: both;"></div>
+            </div>
+        </div>
+    </div> 
+    <!-- END MODALS -->
+    
     <body>   
         <div class="ict-range">
             <div class="ict-header">
@@ -20,11 +71,11 @@
                     InteractiveCodingTool
                 </h1>
                 <div class="ict-menu">
-                    <button onclick="tryFileDownload()">
+                    <button onclick="tryFileDownload()" id="save_button">
                         <i class="fa-solid fa-floppy-disk fa-2xl"></i>
                     </button>
-                    <button>
-                        <label for="file-upload" class="file_upload_label">
+                    <button id="upload">
+                        <label for="file-upload" class="file_upload_label" id="upload_button">
                             <i class="fa-solid fa-folder-open fa-2xl"></i>
                         </label>
                         <input type="file" id="file-upload" class="file_uploader" onchange="tryFileUpload()"/>  
@@ -40,6 +91,9 @@
                     </button>
                     <button onclick="display()" title="Code visualisieren">
                         <i class="fa-solid fa-code fa-2xl"></i>
+                    </button>
+                    <button onclick="openModal('tutorial_modal')" title="Tutorials" class="float-right">
+                        <i class="fa-solid fa-circle-info fa-2xl"></i>
                     </button>
                 </div>
             </div>

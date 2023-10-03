@@ -3,6 +3,7 @@
 document.addEventListener('DOMContentLoaded', function(){
     initIctNumbers();
     initIctEditor();
+    initIctTutorial();
 });
 
 function initIctNumbers() {
@@ -227,5 +228,118 @@ function check_tab(element, event) {
         element.selectionStart = cursor_pos;
         element.selectionEnd = cursor_pos;
         update_syntax(element.value); // Update text to include indent
+    }
+}
+
+/*
+ * interactive tutorials:
+ * This part only controlls the functionallity of the tutorials. To add content please 
+ * do so in the designated script "tutorials.js"
+ */
+let current_tutorial_step = 0;
+let current_tutorial = null;
+let focused_element = null;
+
+let tutorial_toast = null;
+let tutorial_title = null;
+let tutorial_content = null;
+let tutorial_prev = null;
+let tutorial_next = null;
+let tutorial_overlay = null;
+
+function initIctTutorial() {
+    // check if the tutorial toast exists, if that's the case initialize it
+    tutorial_toast = document.getElementById('ict-tutorial_toast');
+
+    if (tutorial_toast) {
+        tutorial_title = document.getElementById('ict-tutorial_title');
+        tutorial_content = document.getElementById('ict-tutorial_content');
+        tutorial_prev = document.getElementById('ict-tutorial_prev');
+        tutorial_next = document.getElementById('ict-tutorial_next');
+        tutorial_overlay = document.getElementById('ict-overlay');      
+        
+        // Event listeners for next and previous buttons
+        tutorial_prev.addEventListener('click', handlePrev);
+        tutorial_next.addEventListener('click', handleNext);
+    }
+}
+
+function startTutorial(type, title='Tutorial') {
+    try {
+        current_tutorial = tutorials[type];
+        current_tutorial_step = 0;
+        tutorial_title.textContent = title;
+        showTutorial(current_tutorial_step);
+    }
+    catch {
+        console.log('something went wrong. Perhaps you didn\'t define this tutorial type yet.');
+    }
+}
+
+function showTutorial(step) {
+    // remove last focus, if it exists
+    if(focused_element) {
+        focused_element.classList.remove('ict-focused_element');
+    }
+    
+    const { target, content, trigger } = current_tutorial[step];
+    const targetElement = document.querySelector(target);
+
+    if (targetElement) {
+        // add focus to our target element if there is one
+        targetElement.classList.add('ict-focused_element');
+        focused_element = targetElement;
+
+        
+        // Position the tutorial toast to our target 
+        const rect = targetElement.getBoundingClientRect();    
+        tutorial_toast.style.top = rect.bottom + 'px';
+        tutorial_toast.style.left = rect.left + 'px';
+
+        // if transform was set, set it to "none"
+        if(tutorial_toast.style.transform) {
+            tutorial_toast.style.transform = 'none';
+        }
+    }
+    else {
+        // center the toast, if there is no target element
+        tutorial_toast.style.top = '50%';
+        tutorial_toast.style.left = '50%';
+        tutorial_toast.style.transform = 'translate(-50%, -50%)';
+    }
+    
+    tutorial_toast.style.display = 'block';
+    tutorial_content.textContent = content;
+    tutorial_content.style.display = 'block';
+    tutorial_overlay.style.display = 'block';
+
+    if (trigger) {
+        const triggerFunction = Function(trigger);
+        triggerFunction();
+    }
+}
+
+function hideTutorial() {
+    if(focused_element) {
+        focused_element.classList.remove('ict-focused_element');
+    }
+    
+    tutorial_toast.style.display = 'none';
+    tutorial_overlay.style.display = 'none';
+}
+
+function handleNext() {
+    current_tutorial_step++;
+    if (current_tutorial_step < current_tutorial.length) {
+        showTutorial(current_tutorial_step);
+    } else {
+        hideTutorial();
+    }
+}
+
+function handlePrev() {
+    if (current_tutorial_step > 0) {
+        current_tutorial_step--;
+        showTutorial(current_tutorial_step);
     }
 }
