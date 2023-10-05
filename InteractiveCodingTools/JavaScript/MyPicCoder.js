@@ -198,6 +198,7 @@ function transformToSvg(rawFile, type = 'image/svg+xml') {
                     }
                     else {
                         var pixelVal = Math.round((parseInt(picInfo[currIndex]) / maxValue) * 255);
+                        pixelVal = isNaN(pixelVal) ? 255 : pixelVal;
                     }
 
                     var newRect = '<rect x="' + x +'" y="' + y + '" width="1" height="1" fill="rgb(' + pixelVal + ',' + pixelVal + ',' + pixelVal + ')"/>\n'
@@ -240,6 +241,10 @@ function transformToSvg(rawFile, type = 'image/svg+xml') {
                         var r = Math.round((parseInt(picInfo[currIndex]) / maxValue) * 255);
                         var g = Math.round((parseInt(picInfo[currIndex + 1]) / maxValue) * 255);
                         var b = Math.round((parseInt(picInfo[currIndex + 2]) / maxValue) * 255);
+
+                        r = isNaN(r) ? 255 : r;
+                        g = isNaN(g) ? 255 : g;
+                        b = isNaN(b) ? 255 : b;
                     }
 
                     var newRect = '<rect x="' + x +'" y="' + y + '" width="1" height="1" fill="rgb(' + r + ',' + g + ',' + b + ')"/>\n'

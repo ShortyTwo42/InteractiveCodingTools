@@ -572,6 +572,7 @@ input[type="number"] {
     border-radius: 0.4rem;
     width: 100%;
     padding: 0.5rem 1rem;
+    margin: 0.3rem 0rem;
 }
 
 .ict-tutorial_button:hover {

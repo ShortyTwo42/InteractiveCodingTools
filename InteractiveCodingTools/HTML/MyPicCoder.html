@@ -4,12 +4,74 @@
         <link rel="stylesheet" href="../CSS/fontawesome/css/all.min.css">               <!-- keep this for fontawesome icons (save, load, ...) -->
         <link rel="stylesheet" href="../CSS/InteractiveCodingTemplate.css">             <!-- keep this for the representation of the tool -->
         <link rel="stylesheet" href="../PrismJS/prism.css">                             <!-- keep this for syntax highlighting -->
+        <script src="../JavaScript/Tutorial.js"></script>                               <!-- keep this if you want to add tutorials to the tool -->
         <script src="../JavaScript/InteractiveCodingTemplate.js"></script>              <!-- keep this for the basic javascript functionalities -->
         <script src="../JavaScript/MyPicCoder.js"></script>
         <script src="../PrismJS/prism.js"></script>                                     <!-- keep this for syntax highlighting -->
     </head>
 
+    <!-- START TUTORIAL -->
+    <div id="ict-overlay"></div>
+    <div id="ict-tutorial_toast">
+        <div class="ict-tutorial_header">
+            <span class="ict-close" onclick="hideTutorial()">
+                &times;
+            </span>
+            <h3 id="ict-tutorial_title">Test</h3>
+        </div>
+        <div class="ict-tutorial_body">
+            <div id="ict-tutorial_content"></div>
+        </div>
+        <div class="ict-tutorial_footer">
+            <button id="ict-tutorial_prev">
+                <i class="fa-solid fa-angle-left fa-2xl"></i>
+            </button>
+            <button id="ict-tutorial_next" class="float-right_tutorial">
+                <i class="fa-solid fa-angle-right fa-2xl"></i>
+            </button>
+        </div>
+    </div>
+    <!-- END TUTORIAL -->
+
     <!-- START MODALS -->
+    <div class="ict-modal" id="tutorial_modal">
+        <div class="ict-modal-content">
+            <div class="ict-modal-header">
+                <span class="ict-close" onclick="closeModal('tutorial_modal')">
+                    &times;
+                </span>
+                <h2>
+                    Tutorials
+                </h2>
+            </div>
+            <div class="ict-modal-body">
+                <p>
+                    Wähle ein Tutorial aus
+                </p>
+                <p>
+                    <button class="ict-tutorial_button" onclick="startTutorial('my_pic_coder_overview', 'Überblick'); closeModal('tutorial_modal');">
+                        <label>Überblick</label>
+                    </button>
+                    <button class="ict-tutorial_button" onclick="startTutorial('pbm_format', 'Portable Bitmap'); closeModal('tutorial_modal');">
+                        <label>Portable Bitmap (PBM)</label>
+                    </button>
+                    <button class="ict-tutorial_button" onclick="startTutorial('pgm_format', 'Portable Graymap'); closeModal('tutorial_modal');">
+                        <label>Portable Graymap (PGM)</label>
+                    </button>
+                    <button class="ict-tutorial_button" onclick="startTutorial('ppm_format', 'Portable Pixmap'); closeModal('tutorial_modal');">
+                        <label>Portable Pixmap (PPM)</label>
+                    </button>
+                    <button class="ict-tutorial_button" onclick="startTutorial('svg_format', 'Scalable Vector Graphic'); closeModal('tutorial_modal');">
+                        <label>Scalable Vector Graphic (SVG)</label>
+                    </button>
+                </p>
+            </div>
+            <div class="ict-modal-footer">
+                <div class="spacer" style="clear: both;"></div>
+            </div>
+        </div>
+    </div> 
+
     <div class="ict-modal" id="example_modal">
         <div class="ict-modal-content">
             <div class="ict-modal-header">
@@ -22,7 +84,7 @@
             </div>
             <div class="ict-modal-body">
                 <p>
-                    <div class="ict-option_item">
+                    <div class="ict-option_item" id="example_type_tutorial">
                         <label for="example_type">
                             Bildtyp:
                         </label>
@@ -42,34 +104,36 @@
                         </select> 
                     </div>   
                 </p>  
-                <div class="ict-option_item">
-                    <label for="example_1">
-                        Smiley
-                    </label>
-                    <input type="radio" id="example_1" name="example" value="smiley" checked/>
-                </div>
-                <div class="ict-option_item">
-                    <label for="example_2">
-                        Haus
-                    </label>
-                    <input type="radio" id="example_2" name="example" value="house"/>
-                </div>
-                <div class="ict-option_item" id="example_3_div">
-                    <label for="example_3">
-                        Videospiel Sprite
-                    </label>
-                    <input type="radio" id="example_3" name="example" value="videogame_character"/>
-                </div>
-                <div class="ict-option_item" style="display: none" id="example_4_div">
-                    <label for="example_4">
-                        File Icon
-                    </label>
-                    <input type="radio" id="example_4" name="example" value="file_icon"/>
+                <div id="example_options_tutorial">
+                    <div class="ict-option_item">
+                        <label for="example_1">
+                            Smiley
+                        </label>
+                        <input type="radio" id="example_1" name="example" value="smiley" checked/>
+                    </div>
+                    <div class="ict-option_item">
+                        <label for="example_2">
+                            Haus
+                        </label>
+                        <input type="radio" id="example_2" name="example" value="house"/>
+                    </div>
+                    <div class="ict-option_item" id="example_3_div">
+                        <label for="example_3">
+                            Videospiel Sprite
+                        </label>
+                        <input type="radio" id="example_3" name="example" value="videogame_character"/>
+                    </div>
+                    <div class="ict-option_item" style="display: none" id="example_4_div">
+                        <label for="example_4">
+                            File Icon
+                        </label>
+                        <input type="radio" id="example_4" name="example" value="file_icon"/>
+                    </div>
                 </div>
             </div>
             <div class="ict-modal-footer">
                 <div class="spacer" style="clear: both;"></div>
-                <button onclick="uploadExample(); closeModal('example_modal')" class="ict-modal-save" title="gewähltes Beispiel hochladen">
+                <button onclick="uploadExample(); closeModal('example_modal')" class="ict-modal-save" title="gewähltes Beispiel hochladen" id="upload_example_tutorial">
                     <i class="fa-solid fa-file-arrow-up fa-2xl"></i>
                 </button>
             </div>
@@ -84,7 +148,7 @@
                     MyPicCoder
                 </h1>
                 <div class="ict-subHeader">
-                    <div class="ict-subHeaderItem">
+                    <div class="ict-subHeaderItem" id="filename_tutorial">
                         <label for="ict-fileName">
                             Dateiname
                         </label>
@@ -92,38 +156,41 @@
                     </div>
                 </div>
                 <div class="ict-menu">
-                    <button onclick="tryFileDownload()">
+                    <button onclick="tryFileDownload()" id="save_tutorial">
                         <i class="fa-solid fa-floppy-disk fa-2xl"></i>
                     </button>
-                    <button>
+                    <button id="upload_tutorial">
                         <label for="file-upload" class="file_upload_label">
                             <i class="fa-solid fa-folder-open fa-2xl"></i>
                         </label>
                         <input type="file" id="file-upload" class="file_uploader" onchange="tryFileUpload()"/>  
                     </button>
-                    <button onclick="openModal('example_modal')" title="Beispielbild auswählen">
+                    <button onclick="openModal('example_modal')" title="Beispielbild auswählen" id="example_tutorial">
                         <i class="fa-solid fa-file-arrow-up fa-2xl"></i>
                     </button>
-                    <button onclick="toggleView('100%', '0%')" title="Code maximieren">
+                    <button onclick="toggleView('100%', '0%')" title="Code maximieren" id="code_max_tutorial">
                         <i class="fa-solid fa-arrow-right fa-2xl"></i>
                     </button>
-                    <button onclick="toggleView('50%', '50%')" title="Split Screen">
+                    <button onclick="toggleView('50%', '50%')" title="Split Screen" id="split_tutorial">
                         <i class="fa-solid fa-arrows-left-right fa-2xl"></i>
                     </button>
-                    <button onclick="toggleView('0%', '100%')" title="Preview maximieren">
+                    <button onclick="toggleView('0%', '100%')" title="Preview maximieren" id="preview_max_tutorial">
                         <i class="fa-solid fa-arrow-left fa-2xl"></i>
                     </button>
-                    <button onclick="display()" title="Lade Preview" class="float-right">
+                    <button onclick="display()" title="Lade Preview" class="float-right" id="display_tutorial">
                         <i class="fa-solid fa-code fa-2xl"></i>
                     </button>
-                    <label class="ict-switch float-right" title="Live Preview">
+                    <label class="ict-switch float-right" title="Live Preview" id="live_preview_tutorial">
                         <input type="checkbox" onchange="toggleAutoRefresh(this)" checked>
                         <span class="ict-slider"></span>
                     </label>
+                    <button onclick="openModal('tutorial_modal')" title="Tutorials" class="float-right">
+                        <i class="fa-solid fa-circle-info fa-2xl"></i>
+                    </button>
                 </div>
             </div>
             <div class="ict-content">
-                <div class="ict-codingSpace">
+                <div class="ict-codingSpace" id="coding_space_tutorial">
                     <div class="ict-wrapper mine_shaft-background">
                         <div class="ict-editor">
                             <div class="ict-lineNumbers">
@@ -138,7 +205,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="ict-previewSpace">
+                <div class="ict-previewSpace" id="preview_space_tutorial">
                     <div class="ict-display white-background">
                     
                     </div>

@@ -4,18 +4,74 @@
         <link rel="stylesheet" href="../CSS/fontawesome/css/all.min.css">               <!-- keep this for fontawesome icons (save, load, ...) -->
         <link rel="stylesheet" href="../CSS/InteractiveCodingTemplate.css">             <!-- keep this for the representation of the tool -->
         <link rel="stylesheet" href="../PrismJS/prism.css">                             <!-- keep this for syntax highlighting -->
+        <script src="../JavaScript/Tutorial.js"></script>                               <!-- keep this if you want to add tutorials to the tool -->
         <script src="../JavaScript/InteractiveCodingTemplate.js"></script>              <!-- keep this for the basic javascript functionalities -->
         <script src="../JavaScript/PutPixel.js"></script>
         <script src="../PrismJS/prism.js"></script>                                     <!-- keep this for syntax highlighting -->
     </head>
+
+    <!-- START TUTORIAL -->
+    <div id="ict-overlay"></div>
+    <div id="ict-tutorial_toast">
+        <div class="ict-tutorial_header">
+            <span class="ict-close" onclick="hideTutorial()">
+                &times;
+            </span>
+            <h3 id="ict-tutorial_title">Test</h3>
+        </div>
+        <div class="ict-tutorial_body">
+            <div id="ict-tutorial_content"></div>
+        </div>
+        <div class="ict-tutorial_footer">
+            <button id="ict-tutorial_prev">
+                <i class="fa-solid fa-angle-left fa-2xl"></i>
+            </button>
+            <button id="ict-tutorial_next" class="float-right_tutorial">
+                <i class="fa-solid fa-angle-right fa-2xl"></i>
+            </button>
+        </div>
+    </div>
+    <!-- END TUTORIAL -->
+
+    <!-- START MODALS -->
+    <div class="ict-modal" id="tutorial_modal">
+        <div class="ict-modal-content">
+            <div class="ict-modal-header">
+                <span class="ict-close" onclick="closeModal('tutorial_modal')">
+                    &times;
+                </span>
+                <h2>
+                    Tutorials
+                </h2>
+            </div>
+            <div class="ict-modal-body">
+                <p>
+                    Wähle ein Tutorial aus
+                </p>
+                <p>
+                    <button class="ict-tutorial_button" onclick="startTutorial('put_pixel_overview', 'Überblick'); closeModal('tutorial_modal');">
+                        <label>Überblick</label>
+                    </button>
+                    <button class="ict-tutorial_button" onclick="startTutorial('put_pixel_function', 'PutPixel'); closeModal('tutorial_modal');">
+                        <label>PutPixel Funktion</label>
+                    </button>
+                </p>
+            </div>
+            <div class="ict-modal-footer">
+                <div class="spacer" style="clear: both;"></div>
+            </div>
+        </div>
+    </div> 
+    <!-- END MODALS -->
+
     <body>   
         <div class="ict-range">
             <div class="ict-header">
                 <h1>
                     PutPixel
                 </h1>
-                <div class="ict-subHeader">
-                    <div class="ict-subHeaderItem">
+                <div class="ict-subHeader" id="dimensions_tutorial">
+                    <div class="ict-subHeaderItem" id="width_tutorial">
                         <div class="ict-option_item">
                             <label for="ict-fileWidth">
                                 Breite
@@ -41,26 +97,29 @@
                         </div>
                     </div>
                 </div>
-                <div class="ict-menu">
-                    <button onclick="resetToDefault()" title="Zurücksetzen auf Beginn">
+                <div class="ict-menu" id="menu_tutorial">
+                    <button onclick="resetToDefault()" title="Zurücksetzen auf Beginn" id="reset_tutorial">
                         <i class="fa-solid fa-rotate-right fa-2xl"></i>
                     </button>
-                    <button onclick="toggleView('100%', '0%')" title="Code maximieren">
+                    <button onclick="toggleView('100%', '0%')" title="Code maximieren" id="code_max_tutorial">
                         <i class="fa-solid fa-arrow-right fa-2xl"></i>
                     </button>
-                    <button onclick="toggleView('50%', '50%')" title="Split Screen">
+                    <button onclick="toggleView('50%', '50%')" title="Split Screen" id="split_tutorial">
                         <i class="fa-solid fa-arrows-left-right fa-2xl"></i>
                     </button>
-                    <button onclick="toggleView('0%', '100%')" title="Preview maximieren">
+                    <button onclick="toggleView('0%', '100%')" title="Preview maximieren" id="preview_max_tutorial">
                         <i class="fa-solid fa-arrow-left fa-2xl"></i>
                     </button>
-                    <button onclick="tryExecuteCode()" title="Programm ausführen" class="float-right">
+                    <button onclick="tryExecuteCode()" title="Programm ausführen" class="float-right" id="execute_tutorial">
                         <i class="fa-solid fa-code fa-2xl"></i>
+                    </button>
+                    <button onclick="openModal('tutorial_modal')" title="Tutorials" class="float-right">
+                        <i class="fa-solid fa-circle-info fa-2xl"></i>
                     </button>
                 </div>
             </div>
             <div class="ict-content">
-                <div class="ict-codingSpace">
+                <div class="ict-codingSpace" id="coding_space_tutorial">
                     <div class="ict-wrapper mine_shaft-background">
                         <div class="ict-editor">
                             <div class="ict-lineNumbers">
@@ -75,7 +134,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="ict-previewSpace">
+                <div class="ict-previewSpace" id="preview_space_tutorial">
                     <div class="ict-display">
                     
                     </div>
