@@ -8,7 +8,7 @@
     --tundora: #454545;
     --mine_shaft: #232323;
     --active_elem: #1871ac;
-    --active_elem: #fa0d00;
+    --active_tutorial_elem: #fa0d00;
 }
 
 html, body {
@@ -562,7 +562,7 @@ input[type="number"] {
 }
 
 .ict-focused_element {
-    border: 0.2rem solid var(--active_elem); 
+    border: 0.2rem solid var(--active_tutorial_elem); 
 }
 
 .ict-tutorial_button {

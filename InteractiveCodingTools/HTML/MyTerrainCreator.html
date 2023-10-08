@@ -4,6 +4,7 @@
         <link rel="stylesheet" href="../CSS/fontawesome/css/all.min.css">               <!-- keep this for fontawesome icons (save, load, ...) -->
         <link rel="stylesheet" href="../CSS/InteractiveCodingTemplate.css">             <!-- keep this for the representation of the tool -->
         <link rel="stylesheet" href="../CSS/MyTerrainCreator.css">
+        <script src="../JavaScript/Tutorial.js"></script>                               <!-- keep this if you want to add tutorials to the tool -->
         <script src="../JavaScript/InteractiveCodingTemplate.js"></script>              <!-- keep this for the basic javascript functionalities -->
         
         <!-- Import maps polyfill -->
@@ -24,7 +25,56 @@
         <script type="module" src="../JavaScript/MyTerrainCreator.js"></script>
     </head>
 
+    <!-- START TUTORIAL -->
+    <div id="ict-overlay"></div>
+    <div id="ict-tutorial_toast">
+        <div class="ict-tutorial_header">
+            <span class="ict-close" onclick="hideTutorial()">
+                &times;
+            </span>
+            <h3 id="ict-tutorial_title">Test</h3>
+        </div>
+        <div class="ict-tutorial_body">
+            <div id="ict-tutorial_content"></div>
+        </div>
+        <div class="ict-tutorial_footer">
+            <button id="ict-tutorial_prev">
+                <i class="fa-solid fa-angle-left fa-2xl"></i>
+            </button>
+            <button id="ict-tutorial_next" class="float-right_tutorial">
+                <i class="fa-solid fa-angle-right fa-2xl"></i>
+            </button>
+        </div>
+    </div>
+    <!-- END TUTORIAL -->
+
     <!-- START MODALS -->
+    <div class="ict-modal" id="tutorial_modal">
+        <div class="ict-modal-content">
+            <div class="ict-modal-header">
+                <span class="ict-close" onclick="closeModal('tutorial_modal')">
+                    &times;
+                </span>
+                <h2>
+                    Tutorials
+                </h2>
+            </div>
+            <div class="ict-modal-body">
+                <p>
+                    Wähle ein Tutorial aus
+                </p>
+                <p>
+                    <button class="ict-tutorial_button" onclick="startTutorial('my_terrain_creator_overview', 'Überblick'); closeModal('tutorial_modal');">
+                        <label>Überblick</label>
+                    </button>
+                </p>
+            </div>
+            <div class="ict-modal-footer">
+                <div class="spacer" style="clear: both;"></div>
+            </div>
+        </div>
+    </div> 
+
     <div class="ict-modal" id="save_modal">
         <div class="ict-modal-content">
             <div class="ict-modal-header">
@@ -41,7 +91,7 @@
                         Heightmap/Texturemap
                     </h2>
                     <div class="ict-option_items">
-                        <div class="ict-option_item">
+                        <div class="ict-option_item" id="save_as_tutorial">
                             <label for="save_as">
                                 Speichern als:
                             </label>
@@ -58,25 +108,27 @@
                             </select> 
                         </div>
                     
-                        <div class="ict-option_item">
-                            <label for="save_heightmap">
-                                Heightmap speichern
-                            </label>
-                            <input type="checkbox" id="save_heightmap" checked/>
-                        </div>
-                    
-                        <div class="ict-option_item">
-                            <label for="save_texturemap">
-                                Texturemap speichern
-                            </label>
-                            <input type="checkbox" id="save_texturemap" checked/>
+                        <div id="save_pic_tutorial">
+                            <div class="ict-option_item">
+                                <label for="save_heightmap">
+                                    Heightmap speichern
+                                </label>
+                                <input type="checkbox" id="save_heightmap" checked/>
+                            </div>
+                        
+                            <div class="ict-option_item">
+                                <label for="save_texturemap">
+                                    Texturemap speichern
+                                </label>
+                                <input type="checkbox" id="save_texturemap" checked/>
+                            </div>
                         </div>
                     </div>
 
                     <h2>
                         Geometrie
                     </h2>
-                    <div class="ict-option_items">
+                    <div class="ict-option_items" id="save_terrain_tutorial">
                         <div class="ict-option_item">
                             <label for="geometry_name">
                                 Dateiname
@@ -94,7 +146,7 @@
             </div>
             <div class="ict-modal-footer">
                 <div class="spacer" style="clear: both;"></div>
-                <button onclick="tryFileDownload(); closeModal('save_modal');" class="ict-modal-save" title="speicher gewählte Daten">
+                <button onclick="tryFileDownload(); closeModal('save_modal');" class="ict-modal-save" title="speicher gewählte Daten" id="save_tutorial">
                     <i class="fa-solid fa-floppy-disk fa-2xl"></i>
                 </button>
             </div>
@@ -155,7 +207,7 @@
             </div>
             <div class="ict-modal-footer">
                 <div class="spacer" style="clear: both;"></div>
-                <button onclick="uploadExample(); closeModal('example_modal')" class="ict-modal-save" title="gewähltes Beispiel hochladen">
+                <button onclick="uploadExample(); closeModal('example_modal')" class="ict-modal-save" title="gewähltes Beispiel hochladen" id="upload_example_tutorial">
                     <i class="fa-solid fa-file-arrow-up fa-2xl"></i>
                 </button>
             </div>
@@ -177,7 +229,7 @@
                     <h2>
                         Heightmap
                     </h2>
-                    <div class="ict-option_items">
+                    <div class="ict-option_items" id="heightmap_create_options_tutorial">
                         <div class="ict-option_item">
                             <label for="new_heightmap_name">
                                 Dateiname
@@ -214,7 +266,7 @@
                     <h2>
                         Texturemap
                     </h2>
-                    <div class="ict-option_items">
+                    <div class="ict-option_items" id="texturemap_create_options_tutorial">
                         <div class="ict-option_item">
                             <label for="new_texturemap_name">
                                 Dateiname
@@ -252,7 +304,7 @@
             </div>
             <div class="ict-modal-footer">
                 <div class="spacer" style="clear: both;"></div>
-                <button onclick="createNewCanvas(); closeModal('new_canvas_modal');" class="ict-modal-save" title="erstelle Heightmap">
+                <button onclick="createNewCanvas(); closeModal('new_canvas_modal');" class="ict-modal-save" title="erstelle Heightmap" id="create_new_canvas_tutorial">
                     <i class="fa-solid fa-square-check fa-2xl"></i>
                 </button>
             </div>
@@ -268,25 +320,25 @@
                 </h1>
 
                 <div id="heightmap_mode">
-                    <div class="ict-subHeader">
+                    <div class="ict-subHeader" id="heightmap_mode_tutorial">
                         <h2>
                             Heightmap Modus
                         </h2>
                     </div>
                     <div class="ict-subHeader">
-                        <div class="ict-subHeaderItem">
+                        <div class="ict-subHeaderItem" id="heightmap_filename_tutorial">
                             <label for="ict-fileName">
                                 Dateiname
                             </label>
                             <input id="ict-fileName" value="Heightmap"></input>
                         </div>
-                        <div class="ict-subHeaderItem">
+                        <div class="ict-subHeaderItem" id="heightmap_filewidth_tutorial">
                             <label for="ict-fileWidth">
                                 Breite
                             </label>
                             <input type="number" id="ict-fileWidth" value="" readonly></input>
                         </div>
-                        <div class="ict-subHeaderItem">
+                        <div class="ict-subHeaderItem" id="heightmap_fileheight_tutorial">
                             <label for="ict-fileHeight">
                                 Höhe
                             </label>
@@ -296,7 +348,7 @@
                 </div>
 
                 <div id="texturemap_mode" style="display: none">
-                    <div class="ict-subHeader">
+                    <div class="ict-subHeader" id="texturemap_mode_tutorial">
                         <h2>
                             Texturemap Modus
                         </h2>
@@ -327,38 +379,41 @@
                     <button onclick="openModal('save_modal')" id="download_button" title="Speichermenü öffnen">
                         <i class="fa-solid fa-floppy-disk fa-2xl"></i>
                     </button>
-                    <button title="Datei hochladen">
+                    <button title="Datei hochladen" id="upload_tutorial">
                         <label for="file-upload" class="file_upload_label">
                             <i class="fa-solid fa-folder-open fa-2xl"></i>
                         </label>
                         <input type="file" data-type="heightmap" id="file-upload" class="file_uploader" onchange="tryFileUpload()"/>  
                     </button>
-                    <button onclick="openModal('example_modal')" title="Beispiel Heightmap/Texturemap auswählen">
+                    <button onclick="openModal('example_modal')" title="Beispiel Heightmap/Texturemap auswählen" id="example_tutorial">
                         <i class="fa-solid fa-file-arrow-up fa-2xl"></i>
                     </button>
                     <button onclick="openModal('new_canvas_modal')" id="create_new_canvas" title="neue Heightmap/Texturemap erstellen">
                         <i class="fa-solid fa-file-circle-plus fa-2xl"></i>
                     </button>
-                    <button onclick="toggleView('100%', '0%')" title="Heightmap Editor maximieren">
+                    <button onclick="toggleView('100%', '0%')" title="Heightmap Editor maximieren" id="max_texture_button">
                         <i class="fa-solid fa-arrow-right fa-2xl"></i>
                     </button>
-                    <button onclick="toggleView('50%', '50%')" title="Split Screen">
+                    <button onclick="toggleView('50%', '50%')" title="Split Screen" id="split_screen_button">
                         <i class="fa-solid fa-arrows-left-right fa-2xl"></i>
                     </button>
-                    <button onclick="toggleView('0%', '100%')" title="Terrain Preview maximieren">
+                    <button onclick="toggleView('0%', '100%')" title="Terrain Preview maximieren" id="max_preview_button">
                         <i class="fa-solid fa-arrow-left fa-2xl"></i>
                     </button>
-                    <button onclick="display()" title="Lade Preview" class="float-right">
+                    <button onclick="display()" title="Lade Preview" class="float-right" id="display_tutorial">
                         <i class="fa-solid fa-play fa-2xl"></i>
                     </button>
-                    <label class="ict-switch float-right" title="Live Preview">
+                    <label class="ict-switch float-right" title="Live Vorschau" id="live_preview_tutorial">
                         <input type="checkbox" onchange="toggleAutoRefresh(this)" checked>
                         <span class="ict-slider"></span>
                     </label>
+                    <button onclick="openModal('tutorial_modal')" title="Tutorials" class="float-right">
+                        <i class="fa-solid fa-circle-info fa-2xl"></i>
+                    </button>
                 </div>
             </div>
             <div class="ict-content">
-                <div class="ict-codingSpace">
+                <div class="ict-codingSpace" id="coding_space_tutorial">
                     <div class="canvas_wrapper">
                         <nav class="sidebar">
                             <ul class="sidebar-nav">
@@ -391,7 +446,7 @@
                         </nav>
                         <div class="my_terrain_menu" style="display: none">
                             <div class="ict-wrapper">
-                                <div class="ict-box">
+                                <div class="ict-box" id="brush_options_tutorial">
                                     <h2>
                                         Pinsel-Optionen
                                     </h2>
@@ -415,7 +470,7 @@
                                             <input type="color" id="texture_color" value="#000000"/>
                                         </div>
                                         
-                                        <div class="ict-option_item">
+                                        <div class="ict-option_item" id="opacity_tutorial">
                                             <label for="opacity">
                                                 Deckkraft (%)
                                             </label>
@@ -426,7 +481,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="ict-option_item">
+                                        <div class="ict-option_item" id="brush_tutorial">
                                             <label for="brushSize">
                                                 Pinselgröße (px)
                                             </label>
@@ -437,7 +492,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="ict-option_item">
+                                        <div class="ict-option_item" id="falloff_tutorial">
                                             <label for="falloff">
                                                 weicher Pinsel
                                             </label>
@@ -445,33 +500,36 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="ict-box">
+                                <div class="ict-box" id="terrain_options_tutorial">
                                     <h2>
                                         Terrain-Optionen
                                     </h2>
-                                    <div class="ict-option_item">
-                                        <label for="resolution_x">
-                                            Terrain Auflösung X
-                                        </label>
-                                        <div class="ict-number_container">
-                                            <button onclick="decreaseNumber('resolution_x')" class="decrease_button">-</button>
-                                            <input type="number" min="2" max="500" step="50" class="ict-numbers" id="resolution_x" value="100"/>
-                                            <button onclick="increaseNumber('resolution_x')" class="increase_button">+</button>
+                                    
+                                    <div id="resolution_tutorial">
+                                        <div class="ict-option_item">
+                                            <label for="resolution_x">
+                                                Terrain Auflösung X
+                                            </label>
+                                            <div class="ict-number_container">
+                                                <button onclick="decreaseNumber('resolution_x')" class="decrease_button">-</button>
+                                                <input type="number" min="2" max="500" step="50" class="ict-numbers" id="resolution_x" value="100"/>
+                                                <button onclick="increaseNumber('resolution_x')" class="increase_button">+</button>
+                                            </div>
+                                        </div>
+    
+                                        <div class="ict-option_item">
+                                            <label for="resolution_x">
+                                                Terrain Auflösung Y
+                                            </label>
+                                            <div class="ict-number_container">
+                                                <button onclick="decreaseNumber('resolution_y')" class="decrease_button">-</button>
+                                                <input type="number" min="2" max="500" step="50" class="ict-numbers" id="resolution_y" value="100"/>
+                                                <button onclick="increaseNumber('resolution_y')" class="increase_button">+</button>
+                                            </div>
                                         </div>
                                     </div>
-
-                                    <div class="ict-option_item">
-                                        <label for="resolution_x">
-                                            Terrain Auflösung Y
-                                        </label>
-                                        <div class="ict-number_container">
-                                            <button onclick="decreaseNumber('resolution_y')" class="decrease_button">-</button>
-                                            <input type="number" min="2" max="500" step="50" class="ict-numbers" id="resolution_y" value="100"/>
-                                            <button onclick="increaseNumber('resolution_y')" class="increase_button">+</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="ict-option_item">
+                                    
+                                    <div class="ict-option_item" id="terrain_scale_tutorial">
                                         <label for="terrain_scale">
                                             Terrain Skalierung
                                         </label>
@@ -482,7 +540,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="ict-option_item">
+                                    <div class="ict-option_item" id="displacement_scale_tutorial">
                                         <label for="displacement_scale">
                                             Höhenmap Skalierung
                                         </label>
@@ -493,26 +551,26 @@
                                         </div>
                                     </div>
 
-                                    <div class="ict-option_item">
+                                    <div class="ict-option_item" id="wireframe_tutorial">
                                         <label for="wireframe">
                                             Wireframe
                                         </label>
                                         <input type="checkbox" id="wireframe"/>
                                     </div>
                                 </div>
-                                <div class="ict-box">
+                                <div class="ict-box" id="light_options_tutorial">
                                     <h2>
                                         Licht-Optionen
                                     </h2>
-                                    <div class="ict-option_item">
+                                    <div class="ict-option_item" id="light_rotation_tutorial">
                                         <label for="light_rotation">
                                             Licht-Rotation
                                         </label>
                                         <input type="checkbox" id="light_rotation"/>
                                     </div>
 
-                                    <div class="ict-option_item">
-                                        <label for="displacement_scale">
+                                    <div class="ict-option_item" id="light_rotation_speed_tutorial">
+                                        <label for="light_rotation_speed">
                                             Rotations Geschwindigkeit
                                         </label>
                                         <div class="ict-number_container">
@@ -522,7 +580,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="ict-option_item">
+                                    <div class="ict-option_item" id="light_color_tutorial">
                                         <label for="light_color_picker">
                                             Farbe
                                         </label>
@@ -541,7 +599,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="ict-previewSpace">
+                <div class="ict-previewSpace" id="preview_space_tutorial">
                     <div class="ict-display" id="terrain_container">
                         <canvas id="terrain_preview_canvas">
 

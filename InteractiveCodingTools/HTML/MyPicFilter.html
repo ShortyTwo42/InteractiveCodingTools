@@ -4,11 +4,67 @@
         <link rel="stylesheet" href="../CSS/fontawesome/css/all.min.css">               <!-- keep this for fontawesome icons (save, load, ...) -->
         <link rel="stylesheet" href="../CSS/InteractiveCodingTemplate.css">             <!-- keep this for the representation of the tool -->
         <link rel="stylesheet" href="../CSS/MyPicFilter.css">  
+        <script src="../JavaScript/Tutorial.js"></script>                               <!-- keep this if you want to add tutorials to the tool -->
         <script src="../JavaScript/InteractiveCodingTemplate.js"></script>              <!-- keep this for the basic javascript functionalities -->
         <script src="../JavaScript/MyPicFilter.js"></script>
     </head>
 
+    <!-- START TUTORIAL -->
+    <div id="ict-overlay"></div>
+    <div id="ict-tutorial_toast">
+        <div class="ict-tutorial_header">
+            <span class="ict-close" onclick="hideTutorial()">
+                &times;
+            </span>
+            <h3 id="ict-tutorial_title">Test</h3>
+        </div>
+        <div class="ict-tutorial_body">
+            <div id="ict-tutorial_content"></div>
+        </div>
+        <div class="ict-tutorial_footer">
+            <button id="ict-tutorial_prev">
+                <i class="fa-solid fa-angle-left fa-2xl"></i>
+            </button>
+            <button id="ict-tutorial_next" class="float-right_tutorial">
+                <i class="fa-solid fa-angle-right fa-2xl"></i>
+            </button>
+        </div>
+    </div>
+    <!-- END TUTORIAL -->
+
     <!-- START MODALS -->
+    <div class="ict-modal" id="tutorial_modal">
+        <div class="ict-modal-content">
+            <div class="ict-modal-header">
+                <span class="ict-close" onclick="closeModal('tutorial_modal')">
+                    &times;
+                </span>
+                <h2>
+                    Tutorials
+                </h2>
+            </div>
+            <div class="ict-modal-body">
+                <p>
+                    Wähle ein Tutorial aus
+                </p>
+                <p>
+                    <button class="ict-tutorial_button" onclick="startTutorial('my_pic_filter_overview', 'Überblick'); closeModal('tutorial_modal');">
+                        <label>Überblick</label>
+                    </button>
+                    <button class="ict-tutorial_button" onclick="startTutorial('my_pic_filter_sp_noise', 'Salz-und-Pfeffer-Rauschen'); closeModal('tutorial_modal');">
+                        <label>Salz-und-Pfeffer-Rauschen</label>
+                    </button>
+                    <button class="ict-tutorial_button" onclick="startTutorial('my_pic_filter_gaussian_noise', 'Gauß-Rauschen'); closeModal('tutorial_modal');">
+                        <label>Gauß-Rauschen</label>
+                    </button>
+                </p>
+            </div>
+            <div class="ict-modal-footer">
+                <div class="spacer" style="clear: both;"></div>
+            </div>
+        </div>
+    </div> 
+
     <div class="ict-modal" id="save_modal">
         <div class="ict-modal-content">
             <div class="ict-modal-header">
@@ -20,45 +76,49 @@
                 </h2>
             </div>
             <div class="ict-modal-body">
-                <p>   
-                    <label for="save_as">
-                        Speichern als:
-                    </label>
-                    <select id="save_as">
-                        <option value="pgm">
-                            PGM
-                        </option>
-                        <option value="ppm">
-                            PPM
-                        </option>
-                        <option value="jpg">
-                            JPG
-                        </option>
-                        <option value="png">
-                            PNG
-                        </option>
-                    </select> 
+                <p> 
+                    <div id="save_as_tutorial">
+                        <label for="save_as">
+                            Speichern als:
+                        </label>
+                        <select id="save_as">
+                            <option value="pgm">
+                                PGM
+                            </option>
+                            <option value="ppm">
+                                PPM
+                            </option>
+                            <option value="jpg">
+                                JPG
+                            </option>
+                            <option value="png">
+                                PNG
+                            </option>
+                        </select> 
+                    </div>  
                 </p>   
-                <p>
-                    <div class="ict-option_item">
-                        <label for="save_input_image">
-                            Eingabebild speichern
-                        </label>
-                        <input type="checkbox" id="save_input_image"/>
-                    </div>
-                </p>
-                <p>
-                    <div class="ict-option_item">
-                        <label for="save_output_image">
-                            gefiltertes Bild speichern 
-                        </label>
-                        <input type="checkbox" id="save_output_image" checked/>
-                    </div>
-                </p>
+                <div id="save_pic_tutorial">
+                    <p>
+                        <div class="ict-option_item">
+                            <label for="save_input_image">
+                                Eingabebild speichern
+                            </label>
+                            <input type="checkbox" id="save_input_image"/>
+                        </div>
+                    </p>
+                    <p>
+                        <div class="ict-option_item">
+                            <label for="save_output_image">
+                                gefiltertes Bild speichern 
+                            </label>
+                            <input type="checkbox" id="save_output_image" checked/>
+                        </div>
+                    </p>
+                </div>
             </div>
             <div class="ict-modal-footer">
                 <div class="spacer" style="clear: both;"></div>
-                <button onclick="tryFileDownload(); closeModal('save_modal');" class="ict-modal-save">
+                <button onclick="tryFileDownload(); closeModal('save_modal');" class="ict-modal-save" id="save_tutorial">
                     <i class="fa-solid fa-floppy-disk fa-2xl"></i>
                 </button>
             </div>
@@ -72,22 +132,24 @@
                     &times;
                 </span>
                 <h2>
-                    Beispiel Bilder
+                    Beispielbilder
                 </h2>
             </div>
             <div class="ict-modal-body">   
-                <p>   
-                    <label for="example_type">
-                        Bildart:
-                    </label>
-                    <select id="example_type">
-                        <option value="grayscale">
-                            Graustufenbild
-                        </option>
-                        <option value="color">
-                            Farbbild
-                        </option>
-                    </select> 
+                <p> 
+                    <div id="example_type_tutorial">
+                        <label for="example_type">
+                            Bildart:
+                        </label>
+                        <select id="example_type">
+                            <option value="grayscale">
+                                Graustufenbild
+                            </option>
+                            <option value="color">
+                                Farbbild
+                            </option>
+                        </select> 
+                    </div>  
                 </p>  
                 <div class="ict-option_item">
                     <label for="example_1">
@@ -110,7 +172,7 @@
             </div>
             <div class="ict-modal-footer">
                 <div class="spacer" style="clear: both;"></div>
-                <button onclick="uploadExample(); closeModal('example_modal')" class="ict-modal-save" title="gewähltes Beispiel hochladen">
+                <button onclick="uploadExample(); closeModal('example_modal')" class="ict-modal-save" title="gewähltes Beispiel hochladen" id="example_upload_tutorial">
                     <i class="fa-solid fa-file-arrow-up fa-2xl"></i>
                 </button>
             </div>
@@ -125,19 +187,19 @@
                     MyPicFilter
                 </h1>
                 <div class="ict-subHeader">
-                    <div class="ict-subHeaderItem">
+                    <div class="ict-subHeaderItem" id="filename_tutorial">
                         <label for="ict-fileName">
                             Dateiname
                         </label>
                         <input id="ict-fileName" value=""></input>
                     </div>
-                    <div class="ict-subHeaderItem">
+                    <div class="ict-subHeaderItem" id="filewidth_tutorial">
                         <label for="ict-fileWidth">
                             Breite
                         </label>
                         <input type="number" id="ict-fileWidth" value="0" readonly></input>
                     </div>
-                    <div class="ict-subHeaderItem">
+                    <div class="ict-subHeaderItem" id="fileheight_tutorial">
                         <label for="ict-fileHeight">
                             Höhe
                         </label>
@@ -145,7 +207,7 @@
                     </div>
                 </div>
                 <div class="ict-subHeader">
-                    <div class="ict-subHeaderItem">
+                    <div class="ict-subHeaderItem" id="noise_tutorial">
                         <label for="image_noise">
                             Bildrauschen
                         </label>
@@ -160,7 +222,7 @@
                     </div>
 
                     <div class="ict-subHeaderItem">
-                        <div class="ict-option_item">
+                        <div class="ict-option_item" id="noise_strength_tutorial">
                             <label for="noise_percentage" id="noise_percentage_label">
                                 Rauschanteil (%)
                             </label>
@@ -174,8 +236,8 @@
                             </button>
                         </div>
                     </div>
-                    
                 </div>
+
                 <div class="ict-menu">
                     <button onclick="openModal('save_modal')" id="download_button">
                         <i class="fa-solid fa-floppy-disk fa-2xl"></i>
@@ -198,23 +260,26 @@
                     <button onclick="toggleView('0%', '100%')" title="Gefiltertes Bild maximieren" id="max_filtered_button">
                         <i class="fa-solid fa-arrow-left fa-2xl"></i>
                     </button>
-                    <button onclick="toggleFilterMenu()" title="Filter bearbeiten" class="float-right">
+                    <button onclick="toggleFilterMenu()" title="Filter Menü öffnen" class="float-right" id="filter_menu_tutorial">
                         <i class="fa-solid fa-table-cells fa-2xl"></i>
                     </button>
                     <button onclick="applyFilter()" title="Filter anwenden" class="float-right" id="filter_button">
                         <i class="fa-solid fa-play fa-2xl"></i>
                     </button>
+                    <button onclick="openModal('tutorial_modal')" title="Tutorials" class="float-right">
+                        <i class="fa-solid fa-circle-info fa-2xl"></i>
+                    </button>
                 </div>
             </div>
             <div class="ict-content">
-                <div class="ict-codingSpace">
+                <div class="ict-codingSpace" id="coding_space_tutorial">
                     <div class="ict-wrapper mine_shaft-background">
                         <canvas id="original_img" class="fill_width">
                             
                         </canvas>
                     </div>
                 </div>
-                <div class="ict-previewSpace">
+                <div class="ict-previewSpace" id="preview_space_tutorial">
                     <div class="ict-wrapper mine_shaft-background">
                         <canvas id="filtered_img" class="fill_width">
                             
@@ -224,7 +289,7 @@
                 <div class="filter_menu" style="display: none">
                     <div class="range_container">
                         <div class="range">
-                            <div class="range_item">
+                            <div class="range_item" id="choose_filter_tutorial">
                                 <label for="filter_type">
                                     Filter:
                                 </label>
@@ -244,7 +309,7 @@
                                 </select> 
                             </div>
 
-                            <div class="range_item">
+                            <div class="range_item" id="choose_border_treatment_tutorial">
                                 <label for="border_treatment">
                                     Randbehandlung:
                                 </label>
@@ -262,7 +327,7 @@
                             </div>
                         </div>
                         <div id="none_tab" class="range tab">
-                            <div class="ict-wrapper no-xScroll">
+                            <div class="ict-wrapper no-xScroll" id="none_info_tutorial">
                                 <div class="ict-box">
                                     <h2>Filter-Info</h2>
                                     Momentan ist kein Filter ausgewählt. Das Eingabebild wird bei Durchführung der Filterung nur kopiert
@@ -270,14 +335,14 @@
                             </div>
                         </div>
                         <div id="median_tab" class="range tab" style="display: none">
-                            <div class="ict-wrapper no-xScroll">
+                            <div class="ict-wrapper no-xScroll" id="median_info_tutorial">
                                 <div class="ict-box">
                                     <h2>Filter-Info</h2>
                                     Der Median-Filter betrachtet alle Pixel in seinem Einflussbereich, 
                                     sortiert diese aufsteigend nach ihrem Wert und wählt anschließend das 
                                     mittlere Element als neuen Wert für das aktuelle Pixel aus.
                                 </div>
-                                <div class="ict-box">
+                                <div class="ict-box" id="median_radius_tutorial">
                                     <h2>Filter-Optionen</h2>
                                     <label for="median_radius">
                                         Radius
@@ -294,14 +359,14 @@
                             </div>
                         </div>
                         <div id="mean_tab" class="range tab" style="display: none">
-                            <div class="ict-wrapper no-xScroll">
+                            <div class="ict-wrapper no-xScroll" id="mean_info_tutorial">
                                 <div class="ict-box">
                                     <h2>Filter-Info</h2>
                                     Der Mittelwert-Filter summiert alle Werte der Pixel in seinem Einflussbereich auf.
                                     Anschließend wird der aufsummierte Wert durch die Anzahl an Pixeln im Einflussbereich geteilt.
                                     Der somit ermittelte Mittelwert wird als neuer Wert für das aktuelle Pixel eingesetzt.
                                 </div>
-                                <div class="ict-box">
+                                <div class="ict-box" id="mean_radius_tutorial">
                                     <h2>Filter-Optionen</h2>
                                     <label for="mean_radius">
                                         Radius
@@ -319,14 +384,14 @@
                         </div>
                         <div id="gaussian_tab" class="range tab" style="display: none">
                             <div class="ict-wrapper no-xScroll">
-                                <div class="ict-box">
+                                <div class="ict-box" id="gaussian_info_tutorial">
                                     <h2>Filter-Info</h2>
                                     Der Gauß-Filter funktioniert ähnlich wie der Mittelwert-Filter. Es wird nur davon ausgegangen, dass
-                                    weiter entfehrnte Pixelwerte weniger einfluss auf unser zentrales Pixel nehmen sollten. Deshalb werden
-                                    die Pixelwerte zusätzlich gewichtet. Desto näher der Pixel zum aktuellen Pixel, desto größer sein Einfluss
+                                    weiter entfehrnte Pixelwerte weniger Einfluss auf unser zentrales Pixel nehmen sollten. Deshalb werden
+                                    die Pixelwerte zusätzlich gewichtet. Desto näher der Pixel zum aktuellen Pixel, umso größer sein Einfluss
                                     auf den neu berechneten Wert.
                                 </div>
-                                <div class="ict-box">
+                                <div class="ict-box" id="gaussian_radius_tutorial">
                                     <h2>Filter-Optionen</h2>
                                     <label for="gaussian_radius">Radius</label>
                                     <div class="ict-number_container">

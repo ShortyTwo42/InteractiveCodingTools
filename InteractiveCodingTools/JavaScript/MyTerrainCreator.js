@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.update_terrain_heightmap = update_terrain_heightmap;
     window.update_terrain_texture = update_terrain_texture;
     window.update_terrain_geometry = update_terrain_geometry;
+    window.update_terrain_material = update_terrain_material;
     window.handleDecrease = handleDecrease;
     window.handleIncrease = handleIncrease;
     window.downloadFile = downloadFile;
@@ -21,6 +22,9 @@ document.addEventListener('DOMContentLoaded', function() {
     window.display = display;
     window.createNewCanvas = createNewCanvas;
     window.uploadExample = uploadExample;
+    window.toggleSidebar = toggleSidebar;
+    window.toggleEraser = toggleEraser;
+    window.toggleTexturemap = toggleTexturemap;
     initDrawingApp();
 });
 
